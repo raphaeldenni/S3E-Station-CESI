@@ -20,7 +20,31 @@
 
 ChainableLED leds(PINLED, PINLED1, NUMBLEDS);
 
+
 void btnPressed();
+
+ISR(TIMER1_COMPA_vect) // fonction périodique
+{
+    static bool state = false;
+    if (state)
+    {
+        leds.setColorRGB(0, 0, 0, 0);
+        state = false;
+    }
+    else
+    {
+        leds.setColorRGB(0, 255, 0, 0);
+        state = true;
+    }
+}
+
+void btnPressed()
+{
+    leds.setColorRGB(0, 0, 0, 0);
+    delay(5000);
+    leds.setColorRGB(0, 255, 0, 0);
+    Serial.println("Button interrupt is pressed");
+}
 
 void setup()
 {
@@ -32,6 +56,17 @@ void setup()
 
     pinMode(PINSTEMP, OUTPUT);
     pinMode(PINSTEMP1, OUTPUT);
+    // initialiser le timer1
+    noInterrupts(); // désactiver toutes les interruptions
+    TCCR1A = 0;
+    TCCR1B = 0;
+    TCNT1 = 0;
+
+    OCR1A = 31250;           // 16MHz/256/2Hz
+    TCCR1B |= (1 << WGM12);  // CTC mode
+    TCCR1B |= (1 << CS12);   // 256 prescaler
+    TIMSK1 |= (1 << OCIE1A); // Activer le mode de comparaison
+    interrupts();            // activer toutes les interruptions
 
     attachInterrupt(digitalPinToInterrupt(PINBTNR), btnPressed, FALLING);
 
