@@ -2,8 +2,8 @@
 #include <ChainableLED.h>
 #include <Adafruit_BME280.h>
 
-#define PINBTN 2
-#define PINBTN1 3
+#define PINBTNG 2
+#define PINBTNR 3
 
 #define PINLED 4
 #define PINLED1 5
@@ -21,7 +21,7 @@ void btnPressed();
 
 void setup() {
   // put your setup code here, to run once:
-  pinMode(PINBTN, INPUT);
+  pinMode(PINBTNG, INPUT);
 
   pinMode(PINSLUM, OUTPUT);
   pinMode(PINSLUM1, OUTPUT);
@@ -29,12 +29,12 @@ void setup() {
   pinMode(PINSTEMP, OUTPUT);
   pinMode(PINSTEMP1, OUTPUT);
 
-  attachInterrupt(digitalPinToInterrupt(PINBTN1), btnPressed, FALLING);
+  attachInterrupt(digitalPinToInterrupt(PINBTNR), btnPressed, FALLING);
 
   Serial.begin(9600);
   
   // Check if the green button is pressed at startup
-  if (digitalRead(PINBTN) == LOW) {
+  if (digitalRead(PINBTNG) == LOW) {
     leds.setColorRGB(0, 0, 255, 0);
     Serial.println("Button is pressed");
 
