@@ -1,6 +1,9 @@
-#include <Arduino.h>
-#include <ChainableLED.h>
-#include <Adafruit_BME280.h>
+#include <Arduino.h> // Arduino library
+#include <SPI.h> // Serial Peripheral Interface library for communication with the SD card and GPS module
+
+#include <ChainableLED.h> // Library for the LED strip
+#include <SD.h> // Library for the SD card
+#include <Adafruit_BME280.h> // Library for the BME280 sensor
 
 #define PINBTNG 2 // initialize the pin for the green button
 #define PINBTNR 3 // initialize the pin for the red button
@@ -87,4 +90,14 @@ void loop()
     Serial.println("TEMP1 : " + String(analogRead(PINSTEMP1)));
 
     delay(1000);
+}
+
+void btnPressed() 
+{
+
+  leds.setColorRGB(0, 0, 0, 0);
+  delay(5000);
+  leds.setColorRGB(0, 255, 0, 0);
+  Serial.println("Button interrupt is pressed");
+
 }
