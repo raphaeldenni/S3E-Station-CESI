@@ -2,21 +2,21 @@
 
 #define PINBTN 3
 
-#define PINLUM A0
-#define PINLUM1 A1
+#define PINSLUM A0 // first luminosity sensor pin
+#define PINSLUM1 A1 // second luminosity sensor pin
 
-#define PINTEMP A2
-#define PINTEMP1 A3
+#define PINSTEMP A2 // first temperature sensor pin
+#define PINSTEMP1 A3 // second temperature sensor pin
 
 void setup() {
   // put your setup code here, to run once:
   pinMode(PINBTN, INPUT);
 
-  pinMode(PINLUM, OUTPUT);
-  pinMode(PINLUM1, OUTPUT);
+  pinMode(PINSLUM, OUTPUT);
+  pinMode(PINSLUM1, OUTPUT);
 
-  pinMode(PINTEMP, OUTPUT);
-  pinMode(PINTEMP1, OUTPUT);
+  pinMode(PINSTEMP, OUTPUT);
+  pinMode(PINSTEMP1, OUTPUT);
 
   Serial.begin(9600);
   
@@ -29,13 +29,13 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-  Serial.println("LUM : " + String(analogRead(PINLUM)));
-  Serial.println("LUM1 : " + String(analogRead(PINLUM1)));
+  Serial.println("LUM : " + String(analogRead(PINSLUM)));
+  Serial.println("LUM1 : " + String(analogRead(PINSLUM1)));
 
   delay(1000);
 
-  Serial.println("TEMP : " + String(analogRead(PINTEMP)));
-  Serial.println("TEMP1 : " + String(analogRead(PINTEMP1)));
+  Serial.println("TEMP : " + String(analogRead(PINSTEMP)));
+  Serial.println("TEMP1 : " + String(analogRead(PINSTEMP1)));
 
   delay(1000);
 
