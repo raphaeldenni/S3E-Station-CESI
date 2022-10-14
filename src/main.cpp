@@ -1,4 +1,6 @@
 #include <Arduino.h>
+#include <ChainableLED.h>
+#include <Adafruit_BME280.h>
 
 #define PINBTN 3
 
