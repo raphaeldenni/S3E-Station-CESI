@@ -1,6 +1,9 @@
-#include <Arduino.h>
-#include <ChainableLED.h>
-#include <Adafruit_BME280.h>
+#include <Arduino.h> // Arduino library
+#include <SPI.h> // Serial Peripheral Interface library for communication with the SD card and GPS module
+
+#include <ChainableLED.h> // Library for the LED strip
+#include <SD.h> // Library for the SD card
+#include <Adafruit_BME280.h> // Library for the BME280 sensor
 
 #define PINBTN 2
 #define PINBTN1 3
@@ -19,7 +22,8 @@ ChainableLED leds(PINLED, PINLED1, NUMBLEDS);
 
 void btnPressed();
 
-void setup() {
+void setup() 
+{
   // put your setup code here, to run once:
   pinMode(PINBTN, INPUT);
 
@@ -35,6 +39,7 @@ void setup() {
   
   // Check if the green button is pressed at startup
   if (digitalRead(PINBTN) == LOW) {
+
     leds.setColorRGB(0, 0, 255, 0);
     Serial.println("Button is pressed");
 
@@ -42,7 +47,8 @@ void setup() {
 
 }
 
-void loop() {
+void loop() 
+{
   // put your main code here, to run repeatedly:
 
   // Check Luminosity sensor pins
@@ -59,9 +65,12 @@ void loop() {
 
 }
 
-void btnPressed() {
+void btnPressed() 
+{
+
   leds.setColorRGB(0, 0, 0, 0);
   delay(5000);
   leds.setColorRGB(0, 255, 0, 0);
   Serial.println("Button interrupt is pressed");
+
 }
