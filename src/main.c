@@ -19,11 +19,11 @@ void setup() {
   pinMode(PINTEMP1, OUTPUT);
 
   Serial.begin(9600);
-  /*
+  
   if (digitalRead(PINBTN) == LOW) {
     Serial.println("Button is pressed");
 
-  }*/
+  }
 
 }
 
