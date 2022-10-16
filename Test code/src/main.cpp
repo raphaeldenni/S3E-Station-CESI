@@ -22,18 +22,34 @@
 
 ChainableLED leds(PINLED, PINLED1, NUMBLEDS);
 
+int ledmode = 0; // initialize the variable for the LED mode
+
 ISR(TIMER1_COMPA_vect) // led state update interrupt
 {
-    static bool state = false;
-    if (state)
+    // led mode 0: off
+    if (ledmode == 0)
     {
         leds.setColorRGB(0, 0, 0, 0);
-        state = false;
     }
-    else
+    // led mode 1: green
+    else if (ledmode == 1)
+    {
+        leds.setColorRGB(0, 0, 255, 0);
+    }
+    // led mode 2: red
+    else if (ledmode == 2)
     {
         leds.setColorRGB(0, 255, 0, 0);
-        state = true;
+    }
+    // led mode 3: yellow
+    else if (ledmode == 3)
+    {
+        leds.setColorRGB(0, 255, 255, 0);
+    }
+    // led mode 4: blue
+    else if (ledmode == 4)
+    {
+        leds.setColorRGB(0, 0, 0, 255);
     }
 }
 
