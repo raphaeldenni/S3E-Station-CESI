@@ -1,8 +1,8 @@
 #include <Arduino.h> // Arduino library
-#include <SPI.h> // Serial Peripheral Interface library for communication with the SD card and GPS module
-#include <SD.h> // Library for the SD card
+#include <SPI.h>     // Serial Peripheral Interface library for communication with the SD card and GPS module
+#include <SD.h>      // Library for the SD card
 
-#include <ChainableLED.h> // Library for the LED strip
+#include <ChainableLED.h>    // Library for the LED strip
 #include <Adafruit_BME280.h> // Library for the BME280 sensor
 
 #define PINBTNG 2 // initialize the pin for the green button
@@ -20,6 +20,8 @@
 
 #define SDPIN 4 // initialize the pin for the SD card
 
+ChainableLED leds(PINLED, PINLED1, NUMBLEDS);
+
 ISR(TIMER1_COMPA_vect) // led state update interrupt
 {
     static bool state = false;
@@ -35,13 +37,11 @@ ISR(TIMER1_COMPA_vect) // led state update interrupt
     }
 }
 
-
-void btnIntPressed() 
+void btnIntPressed()
 {
-  leds.setColorRGB(0, 0, 0, 0);
+    leds.setColorRGB(0, 0, 0, 0);
 
-  Serial.println("Button interrupt is pressed");
-
+    Serial.println("Button interrupt is pressed");
 }
 
 void checkSensors()
@@ -57,7 +57,6 @@ void checkSensors()
     Serial.println("TEMP1 : " + String(analogRead(PINSTEMP1)));
 
     delay(1000);
-
 }
 
 void checkSD()
@@ -70,7 +69,6 @@ void checkSD()
         testFile.println("test");
         testFile.close();
         Serial.println("\nSD card is working\n");
-
     }
     else
     {
@@ -78,7 +76,6 @@ void checkSD()
     }
 
     delay(1000);
-
 }
 
 void setup()
@@ -105,26 +102,22 @@ void setup()
         Serial.println("Button is pressed");
 
         delay(1000);
-
     }
 
     // initialize timer1
     TCCR1A = 0; // set entire TCCR1A register to 0
     TCCR1B = 0; // same for TCCR1B
-    TCNT1 = 0; // initialize counter value to 0
+    TCNT1 = 0;  // initialize counter value to 0
 
-    OCR1A = 32000; // compare match register 16MHz/256/2Hz
-    TCCR1B |= (1 << WGM12); // CTC mode
-    TCCR1B |= (1 << CS12); // 256 prescaler
+    OCR1A = 32000;           // compare match register 16MHz/256/2Hz
+    TCCR1B |= (1 << WGM12);  // CTC mode
+    TCCR1B |= (1 << CS12);   // 256 prescaler
     TIMSK1 |= (1 << OCIE1A); // enable timer compare interrupt
-
 }
-
 
 void loop()
 {
     checkSensors();
 
     checkSD();
-
 }
