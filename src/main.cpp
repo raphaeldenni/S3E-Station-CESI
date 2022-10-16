@@ -20,11 +20,13 @@
 
 ChainableLED leds(PINLED, PINLED1, NUMBLEDS);
 
+int ledMode = 0; // initialize the LED mode variable
+
 ISR(TIMER1_COMPA_vect) // led state update interrupt
 {
     static bool state = false;
     if (state)
-    {
+    { // if the state is true
         leds.setColorRGB(0, 0, 0, 0);
         state = false;
     }
@@ -53,6 +55,7 @@ void setup()
 
     pinMode(PINSTEMP, OUTPUT);
     pinMode(PINSTEMP1, OUTPUT);
+    
     // initialiser le timer1
     TCCR1A = 0; // set entire TCCR1A register to 0
     TCCR1B = 0; // same for TCCR1B
