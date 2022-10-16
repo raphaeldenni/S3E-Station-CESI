@@ -35,11 +35,51 @@ ISR(TIMER1_COMPA_vect) // led state update interrupt
     }
 }
 
-void btnIntPressed(); // function for the button
 
-void checkSensors(); // function for the sensors
+void btnIntPressed() 
+{
+  leds.setColorRGB(0, 0, 0, 0);
 
-void checkSD(); // function for the SD card
+  Serial.println("Button interrupt is pressed");
+
+}
+
+void checkSensors()
+{
+    // Check Luminosity sensor pins
+    Serial.println("LUM : " + String(analogRead(PINSLUM)));
+    Serial.println("LUM1 : " + String(analogRead(PINSLUM1)));
+
+    delay(1000);
+
+    // Check Temperature sensor pins
+    Serial.println("TEMP : " + String(analogRead(PINSTEMP)));
+    Serial.println("TEMP1 : " + String(analogRead(PINSTEMP1)));
+
+    delay(1000);
+
+}
+
+void checkSD()
+{
+    // Check SD card
+    File testFile = SD.open("testlog.txt", FILE_WRITE);
+
+    if (testFile)
+    {
+        testFile.println("test");
+        testFile.close();
+        Serial.println("\nSD card is working\n");
+
+    }
+    else
+    {
+        Serial.println("\nError opening testlog.txt\n");
+    }
+
+    delay(1000);
+
+}
 
 void setup()
 {
@@ -86,69 +126,5 @@ void loop()
     checkSensors();
 
     checkSD();
-
-}
-
-ISR(TIMER1_COMPA_vect) // led state update interrupt
-{
-    static bool state = false;
-
-    if (state)
-    {
-        leds.setColorRGB(0, 0, 0, 0);
-        state = false;
-
-    }
-    else
-    {
-        leds.setColorRGB(0, 255, 0, 0);
-        state = true;
-        
-    }
-
-}
-
-void btnIntPressed() 
-{
-  leds.setColorRGB(0, 0, 0, 0);
-
-  Serial.println("Button interrupt is pressed");
-
-}
-
-void checkSensors()
-{
-    // Check Luminosity sensor pins
-    Serial.println("LUM : " + String(analogRead(PINSLUM)));
-    Serial.println("LUM1 : " + String(analogRead(PINSLUM1)));
-
-    delay(1000);
-
-    // Check Temperature sensor pins
-    Serial.println("TEMP : " + String(analogRead(PINSTEMP)));
-    Serial.println("TEMP1 : " + String(analogRead(PINSTEMP1)));
-
-    delay(1000);
-
-}
-
-void checkSD()
-{
-    // Check SD card
-    File testFile = SD.open("testlog.txt", FILE_WRITE);
-
-    if (testFile)
-    {
-        testFile.println("test");
-        testFile.close();
-        Serial.println("\nSD card is working\n");
-
-    }
-    else
-    {
-        Serial.println("\nError opening testlog.txt\n");
-    }
-
-    delay(1000);
 
 }
