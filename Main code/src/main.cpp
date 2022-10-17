@@ -5,20 +5,20 @@
 #include <SD.h> // Library for the SD card
 #include <Adafruit_BME280.h> // Library for the BME280 sensor
 
-#define PINBTNG 2 // initialize the pin for the green button
-#define PINBTNR 3 // initialize the pin for the red button
+#define GBTN_PIN 2 // initialize the pin for the green button
+#define RBTN_PIN 3 // initialize the pin for the red button
 
-#define PINLED 4   // initialize the pin for the LED
-#define PINLED1 5  // initialize the pin for the LED
-#define NUMBLEDS 1 // number of LEDs in the chain
+#define LED_PIN 4   // initialize the pin for the LED
+#define LED_PIN1 5  // initialize the pin for the LED
+#define LEDS_NUM 1 // number of LEDs in the chain
 
-#define PINSLUM A0  // first luminosity sensor pin
-#define PINSLUM1 A1 // second luminosity sensor pin
+#define LUM_PIN A0  // first luminosity sensor pin
+#define LUM_PIN1 A1 // second luminosity sensor pin
 
-#define PINSTEMP A2  // first temperature sensor pin
-#define PINSTEMP1 A3 // second temperature sensor pin
+#define TEMP_PIN A2  // first temperature sensor pin
+#define TEMP_PIN1 A3 // second temperature sensor pin
 
-ChainableLED leds(PINLED, PINLED1, NUMBLEDS);
+ChainableLED leds(LED_PIN, LED_PIN1, LEDS_NUM);
 
 int ledMode = 0; // initialize the LED mode variable
 
@@ -50,13 +50,13 @@ void setup()
     // put your setup code here, to run once:
 
 
-    pinMode(PINBTNG, INPUT);
+    pinMode(GBTN_PIN, INPUT);
 
-    pinMode(PINSLUM, OUTPUT);
-    pinMode(PINSLUM1, OUTPUT);
+    pinMode(LUM_PIN, OUTPUT);
+    pinMode(LUM_PIN1, OUTPUT);
 
-    pinMode(PINSTEMP, OUTPUT);
-    pinMode(PINSTEMP1, OUTPUT);
+    pinMode(TEMP_PIN, OUTPUT);
+    pinMode(TEMP_PIN1, OUTPUT);
 
     // initialiser le timer1
     TCCR1A = 0; // set entire TCCR1A register to 0
@@ -68,12 +68,12 @@ void setup()
     TCCR1B |= (1 << CS12); // 256 prescaler
     TIMSK1 |= (1 << OCIE1A); // enable timer compare interrupt
 
-    attachInterrupt(digitalPinToInterrupt(PINBTNR), btnPressed, FALLING);
+    attachInterrupt(digitalPinToInterrupt(RBTN_PIN), btnPressed, FALLING);
 
     Serial.begin(9600);
 
     // Check if the green button is pressed at startup
-    if (digitalRead(PINBTNG) == LOW)
+    if (digitalRead(GBTN_PIN) == LOW)
     {
         leds.setColorRGB(0, 0, 255, 0);
         Serial.println("\nGreen button is pressed\n");
@@ -88,14 +88,14 @@ void loop()
     // put your main code here, to run repeatedly:
 
     // Check Luminosity sensor pins
-    Serial.println("LUM : " + String(analogRead(PINSLUM)));
-    Serial.println("LUM1 : " + String(analogRead(PINSLUM1)));
+    Serial.println("LUM : " + String(analogRead(LUM_PIN)));
+    Serial.println("LUM1 : " + String(analogRead(LUM_PIN1)));
 
     delay(1000);
 
     // Check Temperature sensor pins
-    Serial.println("TEMP : " + String(analogRead(PINSTEMP)));
-    Serial.println("TEMP1 : " + String(analogRead(PINSTEMP1)));
+    Serial.println("TEMP : " + String(analogRead(TEMP_PIN)));
+    Serial.println("TEMP1 : " + String(analogRead(TEMP_PIN1)));
 
     delay(1000);
 }
