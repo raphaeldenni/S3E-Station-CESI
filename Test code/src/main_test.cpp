@@ -161,7 +161,7 @@ ISR(TIMER1_COMPA_vect) // led state update interrupt
     }
 }
 
-void maintenanceled()
+void maintenanceMode()
 {
     int timePressed = millis();    // initialize the variable for the time the button is pressed
     while (digitalRead(RBTN_PIN) != HIGH) // if the red button is pressed
@@ -180,9 +180,10 @@ void maintenanceled()
     }
 }
 
-void ecoled()
+void ecoMode()
 {
-    Serial.println("ecoled");
+    Serial.println("ecoMode");
+    // change config file
 }
 
 void checkSensors()
@@ -286,8 +287,8 @@ void setup()
         delay(1000);
     }
 
-    attachInterrupt(digitalPinToInterrupt(RBTN_PIN), maintenanceled, CHANGE);
-    attachInterrupt(digitalPinToInterrupt(GBTN_PIN), ecoled, LOW); // attach interrupt to the green button
+    attachInterrupt(digitalPinToInterrupt(RBTN_PIN), maintenanceMode, CHANGE);
+    attachInterrupt(digitalPinToInterrupt(GBTN_PIN), ecoMode, LOW); // attach interrupt to the green button
 
     SD.begin(SD_PIN); // initialize the SD card
     
