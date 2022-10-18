@@ -1,6 +1,7 @@
 #include <Arduino.h> // Arduino library
 #include <SPI.h>     // Serial Peripheral Interface library for communication with the SD card and GPS module
 #include <SD.h>      // Library for the SD card
+#include <SoftwareSerial.h> // Library for the GPS module
 
 #include <ChainableLED.h>    // Library for the LED strip
 #include <Adafruit_BME280.h> // Library for the BME280 sensor
@@ -18,9 +19,14 @@
 #define TEMP_PIN A2  // first temperature sensor pin
 #define TEMP_PIN1 A3 // second temperature sensor pin
 
-#define SDPIN 4 // initialize the pin for the SD card
+//#define SDPIN 4 // initialize the pin for the SD card
+
+#define GPS_RX 7 // initialize the pin for the GPS module
+#define GPS_TX 8 // initialize the pin for the GPS module
 
 ChainableLED leds(LED_PIN, LED_DATA_PIN, LEDS_NUM);
+
+SoftwareSerial GPS(GPS_RX, GPS_TX); // initialize the pins for the GPS module
 
 int ledMode = 0; // initialize the variable for the LED mode
 
@@ -60,7 +66,7 @@ void checkSensors()
 
     delay(1000);
 }
-
+/*
 void checkSD()
 {
     // Check SD card
@@ -78,6 +84,31 @@ void checkSD()
     }
 
     delay(1000);
+}*/
+
+void checkGPS()
+{
+    // Check GPS module
+    unsigned char gpsData[64];
+
+    int i = 0;
+
+    while (GPS.available())
+    {
+        gpsData[i++] = GPS.read();
+
+        i+=1;
+
+        if (i == 64) break;
+        
+    };
+
+    Serial.print("\nGPS : ");
+    Serial.write(gpsData, i);
+    Serial.print("\n\n");
+
+    delay(1000);
+
 }
 
 void setup()
@@ -94,7 +125,7 @@ void setup()
 
     attachInterrupt(digitalPinToInterrupt(RBTN_PIN), btnIntPressed, LOW); // attach interrupt to the green button
 
-    SD.begin(SDPIN); // initialize the SD card
+    //SD.begin(SDPIN); // initialize the SD card
 
     // Check if the green button is pressed at startup
     if (digitalRead(GBTN_PIN) == LOW)
@@ -122,7 +153,9 @@ void setup()
 
 void loop()
 {
-    checkSensors();
+    checkSensors(); // check the multi-sensor
 
-    checkSD();
+    //checkSD(); // check the SD card
+
+    checkGPS(); // check the GPS module
 }
