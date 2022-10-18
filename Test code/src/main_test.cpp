@@ -91,12 +91,7 @@ ISR(TIMER1_COMPA_vect) // led state update interrupt
         else
         {
             ledState = true;
-<<<<<<< Updated upstream
-            leds.setColorRGB(0, 255, 255, 0); // LED to yellow
-=======
             leds.setColorRGB(0, 255, 127, 0); // LED to yellow
-
->>>>>>> Stashed changes
         }
         break;
 
@@ -129,12 +124,7 @@ ISR(TIMER1_COMPA_vect) // led state update interrupt
 
         }
         break;
-<<<<<<< Updated upstream
     case 9: // SD card FULL error mode
-=======
-
-    case 9: // SD card access error mode
->>>>>>> Stashed changes
         if (ledState)
         {
             ledState = false;
@@ -163,7 +153,6 @@ ISR(TIMER1_COMPA_vect) // led state update interrupt
 
         }
         break;
-<<<<<<< Updated upstream
     case 11: // delay 2x mode 10
             ledState = !ledState;
             ledMode = 10;
@@ -171,11 +160,6 @@ ISR(TIMER1_COMPA_vect) // led state update interrupt
     case 12: // delay 2x mode 8
             ledState = !ledState;
             ledMode = 8;
-=======
-
-    case 11: // delay 2x précedent mode
-            ledState != ledState;
->>>>>>> Stashed changes
         break;
 
     default:
@@ -195,7 +179,6 @@ void RbtnIntPressed()
     }
 }
 
-<<<<<<< Updated upstream
 void GbtnIntPressed()
 {
     int timePressed = millis(); // get the time the button is pressed
@@ -203,10 +186,6 @@ void GbtnIntPressed()
     {
         Serial.println("RbtnIntPressed 5+");
     }
-=======
-    Serial.println("\nButton interrupt is pressed\n");
-
->>>>>>> Stashed changes
 }
 
 void checkSensors()
@@ -279,13 +258,8 @@ void setup()
     pinMode(TEMP_PIN, OUTPUT); // initialize the pin for the temperature sensor
     pinMode(TEMP_PIN1, OUTPUT); // 
 
-<<<<<<< Updated upstream
-=======
-    attachInterrupt(digitalPinToInterrupt(RBTN_PIN), btnIntPressed, LOW); // attach interrupt to the red button
-
     //SD.begin(SDPIN); // initialize the SD card
 
->>>>>>> Stashed changes
     // Check if the green button is pressed at startup
     if (digitalRead(GBTN_PIN) == LOW)
     {
@@ -296,15 +270,12 @@ void setup()
         delay(1000);
     }
 
-<<<<<<< Updated upstream
     attachInterrupt(digitalPinToInterrupt(RBTN_PIN), RbtnIntPressed, CHANGE);
     attachInterrupt(digitalPinToInterrupt(GBTN_PIN), GbtnIntPressed, CHANGE); // attach interrupt to the green button
 
     SD.begin(SDPIN); // initialize the SD card
     
-=======
     // Timer configuration
->>>>>>> Stashed changes
     noInterrupts(); // disable all interrupts
     // initialize timer1
     TCCR1A = 0; // set entire TCCR1A register to 0
@@ -324,13 +295,6 @@ void setup()
 void loop()
 {
     // checkSensors(); // check the multi-sensor
-
     //checkSD(); // check the SD card
-
-<<<<<<< Updated upstream
-    // checkGPS(); // check the GPS module
-=======
     checkGPS(); // check the GPS module
-
->>>>>>> Stashed changes
 }
