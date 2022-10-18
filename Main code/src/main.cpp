@@ -50,23 +50,23 @@ ISR(TIMER1_COMPA_vect) // led state update interrupt
 
     switch (ledMode)
     {
-    case 1:                             // standard mode
+    case STANDARD:                      // standard mode
         leds.setColorRGB(0, 0, 255, 0); // LED to green
         break;
 
-    case 2:                               // configuration mode
+    case CONFIGURATION:                   // configuration mode
         leds.setColorRGB(0, 255, 255, 0); // LED to yellow
         break;
 
-    case 3:                             // economy mode
+    case ECONOMY:                       // economy mode
         leds.setColorRGB(0, 0, 0, 255); // LED to blue
         break;
 
-    case 4:                              // maintenance mode
+    case MAINTENANCE:                    // maintenance mode
         leds.setColorRGB(0, 255, 64, 0); // LED to orange
         break;
 
-    case 5: // clock access error mode
+    case ERROR_CLOCK_ACCESS: // clock access error mode
         if (ledState)
         {
             ledState = false;
@@ -79,7 +79,7 @@ ISR(TIMER1_COMPA_vect) // led state update interrupt
         }
         break;
 
-    case 6: // GPS access error mode
+    case ERROR_GPS: // GPS access error mode
         if (ledState)
         {
             ledState = false;
@@ -92,7 +92,7 @@ ISR(TIMER1_COMPA_vect) // led state update interrupt
         }
         break;
 
-    case 7: // captor acess error mode
+    case ERROR_CAPTOR_ACCESS: // captor acess error mode
         if (ledState)
         {
             ledState = false;
@@ -105,7 +105,7 @@ ISR(TIMER1_COMPA_vect) // led state update interrupt
         }
         break;
 
-    case 8: // Data incoherence mode
+    case ERROR_DATA_INCOHERENCE: // Data incoherence mode
         if (ledState)
         {
             ledState = false;
@@ -114,10 +114,10 @@ ISR(TIMER1_COMPA_vect) // led state update interrupt
         else
         {
             leds.setColorRGB(0, 0, 255, 0); // LED to green
-            ledMode = 11;
+            ledMode = 12;
         }
         break;
-    case 9: // SD card FULL error mode
+    case ERROR_SD_FULL: // SD card FULL error mode
         if (ledState)
         {
             ledState = false;
@@ -130,7 +130,7 @@ ISR(TIMER1_COMPA_vect) // led state update interrupt
         }
         break;
 
-    case 10: // SD card access or edit error mode
+    case ERROR_SD_WRITE: // SD card access or edit error mode
         if (ledState)
         {
             ledState = false;
@@ -144,11 +144,11 @@ ISR(TIMER1_COMPA_vect) // led state update interrupt
         break;
     case 11: // delay 2x mode 10
         ledState = !ledState;
-        ledMode = 10;
+        ledMode = ERROR_SD_WRITE;
         break;
     case 12: // delay 2x mode 8
         ledState = !ledState;
-        ledMode = 8;
+        ledMode = ERROR_DATA_INCOHERENCE;
         break;
 
     default:
