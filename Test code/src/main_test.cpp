@@ -48,7 +48,7 @@ TinyGPSPlus gps; // initialize the GPS module
 
 int ledMode = STANDARD;    // initialize the variable to store the LED mode
 int actualMode = STANDARD; // initialize the variable to store the actual mode
-int precedentMode = STANDARD; // initialize the variable to store the precedent mode
+int precedentMode = MAINTENANCE; // initialize the variable to store the precedent mode
 
 ISR(TIMER1_COMPA_vect) // led state update interrupt
 {
@@ -172,15 +172,15 @@ void maintenanceMode()
     }
     else if (millis() - timePressed > 5000) // if the button is pressed for more than 1 second
     {
-        if (actualMode != MAINTENANCE) // if the LED is not in maintenance mode
-        {
-            ledMode, actualMode = precedentMode; // set the LED to maintenance mode
-            precedentMode = MAINTENANCE;
-        }
-        else // if the LED is in maintenance mode
+        if (actualMode != MAINTENANCE) // if the program is not in MAINTENANCE MODE
         {
             precedentMode = actualMode;
-            ledMode, actualMode = MAINTENANCE; // set the LED to the actual mode
+            ledMode, actualMode = MAINTENANCE; // set the LED to maintenance mode
+        }
+        else // if the program is in MAINTENANCE MODE
+        {
+            ledMode, actualMode = precedentMode;
+            precedentMode = MAINTENANCE;
         }
     }
     else
