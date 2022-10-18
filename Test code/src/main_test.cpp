@@ -9,7 +9,7 @@
 #define RBTN_PIN 3 // initialize the pin for the red button
 
 #define LED_PIN 5   // initialize the pin for the LED
-#define LED_PIN1 6  // initialize the pin for the LED
+#define LED_DATA_PIN 6  // initialize the pin for the LED
 #define LEDS_NUM 1 // number of LEDs in the chain
 
 #define LUM_PIN A0  // first luminosity sensor pin
@@ -20,36 +20,22 @@
 
 #define SDPIN 4 // initialize the pin for the SD card
 
-ChainableLED leds(LED_PIN, LED_PIN1, LEDS_NUM);
+ChainableLED leds(LED_PIN, LED_DATA_PIN, LEDS_NUM);
 
-int ledmode = 0; // initialize the variable for the LED mode
+int ledMode = 0; // initialize the variable for the LED mode
 
 ISR(TIMER1_COMPA_vect) // led state update interrupt
 {
-    // led mode 0: off
-    if (ledmode == 0)
+    static bool ledState = false;
+    if (ledState == true) // if the LED mode is 1
     {
-        leds.setColorRGB(0, 0, 0, 0);
+        ledState = !ledState; // change the LED state
+        leds.setColorRGB(0, 0, 0, 0); // set the LED color to black
     }
-    // led mode 1: green
-    else if (ledmode == 1)
+    if (ledState == false) // if the LED mode is 0
     {
-        leds.setColorRGB(0, 0, 255, 0);
-    }
-    // led mode 2: red
-    else if (ledmode == 2)
-    {
-        leds.setColorRGB(0, 255, 0, 0);
-    }
-    // led mode 3: yellow
-    else if (ledmode == 3)
-    {
-        leds.setColorRGB(0, 255, 255, 0);
-    }
-    // led mode 4: blue
-    else if (ledmode == 4)
-    {
-        leds.setColorRGB(0, 0, 0, 255);
+        ledState = !ledState; // change the LED state
+        leds.setColorRGB(0, 255, 0, 0); // set the LED color to green
     }
 }
 
@@ -119,7 +105,7 @@ void setup()
 
         delay(1000);
     }
-
+    noInterrupts(); // disable all interrupts
     // initialize timer1
     TCCR1A = 0; // set entire TCCR1A register to 0
     TCCR1B = 0; // same for TCCR1B
@@ -131,7 +117,7 @@ void setup()
     TIMSK1 |= (1 << OCIE1A); // enable timer compare interrupt
 
     Serial.println("\nTest code is running\n");
-
+    interrupts(); // enable all interrupts
 }
 
 void loop()
