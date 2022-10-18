@@ -40,7 +40,6 @@ ChainableLED leds(LED_PIN, LED_DATA_PIN, LEDS_NUM);
 SoftwareSerial GPS(GPS_RX, GPS_TX); // initialize the pins for the GPS module
 
 int ledMode = 0; // initialize the variable for the LED mode
-int timePressed = 0; // initialize the variable for the time the button is pressed
 
 ISR(TIMER1_COMPA_vect) // led state update interrupt
 {
@@ -147,29 +146,19 @@ ISR(TIMER1_COMPA_vect) // led state update interrupt
 
 void RbtnIntPressed()
 {
-    if (digitalRead(RBTN_PIN) == LOW)
-        if (millis() - timePressed > 5000)
-        {
-            timePressed = 0;
-            Serial.println("RbtnIntPressed 5+");
-        }
-    else
+    int timePressed = millis(); // get the time the button is pressed
+    if (millis() - timePressed > 5000)
     {
-        timePressed = 0;
+        Serial.println("RbtnIntPressed 5+");
     }
 }
 
 void GbtnIntPressed()
 {
-    if (digitalRead(GBTN_PIN) == LOW)
-        if (millis() - timePressed > 5000)
-        {
-            timePressed = 0;
-            Serial.println("GbtnIntPressed 5+");
-        }
-    else
+    int timePressed = millis(); // get the time the button is pressed
+    if (millis() - timePressed > 5000)
     {
-        timePressed = 0;
+        Serial.println("RbtnIntPressed 5+");
     }
 }
 
