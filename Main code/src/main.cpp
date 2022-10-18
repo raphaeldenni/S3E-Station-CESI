@@ -204,7 +204,7 @@ void setup()
     attachInterrupt(digitalPinToInterrupt(RBTN_PIN), maintenanceMode, CHANGE);
     attachInterrupt(digitalPinToInterrupt(GBTN_PIN), ecoMode, CHANGE); // attach interrupt to the green button
 
-    SD.begin(SDPIN); // initialize the SD card
+    SD.begin(SD_PIN); // initialize the SD card
 
     // Timer configuration
     noInterrupts(); // disable all interrupts
