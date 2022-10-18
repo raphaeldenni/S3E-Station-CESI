@@ -25,16 +25,16 @@
 #define GPS_RX 7 // define the pin for the GPS module
 #define GPS_TX 8 // define the pin for the GPS module
 
-#define LED_STANDARD 1 // define the value of the standard mode
-#define LED_CONFIGURATION 2  // define the value of the configuration mode
-#define LED_ECONOMY 3  // define the value of the economy mode
-#define LED_MAINTENANCE 4  // define the value of the maintenance mode
-#define LED_ERROR_CLOCK_ACCESS 5  // define the value of the clock error
-#define LED_ERROR_GPS 6  // define the value of the GPS error mode
-#define LED_ERROR_CAPTOR_ACCESS 7  // define the value of the captor acess error mode
-#define LED_ERROR_DATA_INCOHERENCE 8  // define the value of the INCOHERENCE error mode
-#define LED_ERROR_SD_FULL 9  // define the value of the SD card FULL error mode
-#define LED_ERROR_SD_WRITE 10  // define the value of the BME280 access error mode
+#define STANDARD 1 // define the value of the standard mode
+#define CONFIGURATION 2  // define the value of the configuration mode
+#define ECONOMY 3  // define the value of the economy mode
+#define MAINTENANCE 4  // define the value of the maintenance mode
+#define ERROR_CLOCK_ACCESS 5  // define the value of the clock error
+#define ERROR_GPS 6  // define the value of the GPS error mode
+#define ERROR_CAPTOR_ACCESS 7  // define the value of the captor acess error mode
+#define ERROR_DATA_INCOHERENCE 8  // define the value of the INCOHERENCE error mode
+#define ERROR_SD_FULL 9  // define the value of the SD card FULL error mode
+#define ERROR_SD_WRITE 10  // define the value of the BME280 access error mode
 
 ChainableLED leds(LED_PIN, LED_DATA_PIN, LEDS_NUM);
 
@@ -170,21 +170,21 @@ ISR(TIMER1_COMPA_vect) // led state update interrupt
 
 }
 
-void RbtnIntPressed()
+void maintenanceMode()
 {
     int timePressed = millis(); // get the time the button is pressed
     if (millis() - timePressed > 5000)
     {
-        Serial.println("RbtnIntPressed 5+");
+        Serial.println("maintenanceMode 5+");
     }
 }
 
-void GbtnIntPressed()
+void ecoMode()
 {
     int timePressed = millis(); // get the time the button is pressed
     if (millis() - timePressed > 5000)
     {
-        Serial.println("RbtnIntPressed 5+");
+        Serial.println("maintenanceMode 5+");
     }
 }
 
@@ -270,8 +270,8 @@ void setup()
         delay(1000);
     }
 
-    attachInterrupt(digitalPinToInterrupt(RBTN_PIN), RbtnIntPressed, CHANGE);
-    attachInterrupt(digitalPinToInterrupt(GBTN_PIN), GbtnIntPressed, CHANGE); // attach interrupt to the green button
+    attachInterrupt(digitalPinToInterrupt(RBTN_PIN), maintenanceMode, CHANGE);
+    attachInterrupt(digitalPinToInterrupt(GBTN_PIN), ecoMode, CHANGE); // attach interrupt to the green button
 
     SD.begin(SDPIN); // initialize the SD card
     
