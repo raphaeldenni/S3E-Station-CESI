@@ -1,40 +1,42 @@
 #include <Arduino.h>        // Arduino library
+#include <Wire.h>           // I2C library
 #include <SPI.h>            // Serial Peripheral Interface library for communication with the SD card and GPS module
 #include <SD.h>             // Library for the SD card
 #include <SoftwareSerial.h> // Library for the GPS module
 
-#include <ChainableLED.h>    // Library for the LED strip
-#include <Adafruit_BME280.h> // Library for the BME280 sensor
-#include <TinyGPSPlus.h>     // Library for the GPS module
+#include <ChainableLED.h>            // Library for the LED strip
+#include <Adafruit_Sensor.h>         // Library for the BME280 sensor
+#include <Adafruit_BusIO_Register.h> // Library for the BME280 sensor
+#include <Adafruit_BME280.h>         // Library for the BME280 sensor
+#include <TinyGPSPlus.h>             // Library for the GPS module
 
 #define GBTN_PIN 2 // define the pin for the green button
 #define RBTN_PIN 3 // define the pin for the red button
 
-#define LED_PIN 5      // define the pin for the LED
-#define LED_DATA_PIN 6 // initialize the pin for the LED
-#define LEDS_NUM 1     // number of LEDs in the chain
+#define LED_PIN 5       // define the alimentation pin for the LED
+#define LED_DATA_PIN 6  // define the data pin for the LED
+#define LEDS_NUM 1      // number of LEDs in the chain
 
 #define LUM_PIN A0  // first luminosity sensor pin
 #define LUM_PIN1 A1 // second luminosity sensor pin
 
-#define TEMP_PIN A2  // first temperature sensor pin
-#define TEMP_PIN1 A3 // second temperature sensor pin
+#define SEALEVELPRESSURE_HPA (1013.25) // define the sea level pressure
 
-#define SDPIN 4 // define the pin for the SD card
+#define SD_PIN 4 // define the pin for the SD card
 
-#define GPS_RX 7 // define the pin for the GPS module
-#define GPS_TX 8 // define the pin for the GPS module
+#define GPS_TX 7 // define the TX pin for the GPS module
+#define GPS_RX 8 // define the RX pin for the GPS module
 
-#define STANDARD 1               // define the value of the standard mode
-#define CONFIGURATION 2          // define the value of the configuration mode
-#define ECONOMY 3                // define the value of the economy mode
-#define MAINTENANCE 4            // define the value of the maintenance mode
-#define ERROR_CLOCK_ACCESS 5     // define the value of the clock error
-#define ERROR_GPS 6              // define the value of the GPS error mode
-#define ERROR_CAPTOR_ACCESS 7    // define the value of the captor acess error mode
-#define ERROR_DATA_INCOHERENCE 8 // define the value of the INCOHERENCE error mode
-#define ERROR_SD_FULL 9          // define the value of the SD card FULL error mode
-#define ERROR_SD_WRITE 10        // define the value of the BME280 access error mode
+#define STANDARD 1                // define the value of the standard mode
+#define CONFIGURATION 2           // define the value of the configuration mode
+#define ECONOMY 3                 // define the value of the economy mode
+#define MAINTENANCE 4             // define the value of the maintenance mode
+#define ERROR_CLOCK_ACCESS 5      // define the value of the clock error
+#define ERROR_GPS 6               // define the value of the GPS error mode
+#define ERROR_CAPTOR_ACCESS 7     // define the value of the captor acess error mode
+#define ERROR_DATA_INCOHERENCE 8  // define the value of the INCOHERENCE error mode
+#define ERROR_SD_FULL 9           // define the value of the SD card FULL error mode
+#define ERROR_SD_WRITE 10         // define the value of the BME280 access error mode
 
 ChainableLED leds(LED_PIN, LED_DATA_PIN, LEDS_NUM);
 
