@@ -5,6 +5,7 @@
 
 #include <ChainableLED.h>    // Library for the LED strip
 #include <Adafruit_BME280.h> // Library for the BME280 sensor
+#include <TinyGPSPlus.h>     // Library for the GPS module
 
 #define GBTN_PIN 2 // define the pin for the green button
 #define RBTN_PIN 3 // define the pin for the red button
@@ -39,97 +40,130 @@ ChainableLED leds(LED_PIN, LED_DATA_PIN, LEDS_NUM);
 
 SoftwareSerial GPS(GPS_RX, GPS_TX); // initialize the pins for the GPS module
 
+TinyGPSPlus gps; // initialize the GPS module
+
 int ledMode = 0; // initialize the variable for the LED mode
 
 ISR(TIMER1_COMPA_vect) // led state update interrupt
 {
     static bool ledState = false;
+
     switch (ledMode)
     {
     case 1: // standard mode
         leds.setColorRGB(0, 0, 255, 0); // LED to green
         break;
+
     case 2: // configuration mode
         leds.setColorRGB(0, 255, 255, 0); // LED to yellow
         break;
+
     case 3: // economy mode
         leds.setColorRGB(0, 0, 0, 255); // LED to blue
         break;
+
     case 4: // maintenance mode
         leds.setColorRGB(0, 255, 64, 0); // LED to orange
         break;
+
     case 5: // clock access error mode
         if (ledState)
         {
             ledState = false;
             leds.setColorRGB(0, 255, 0, 0); // LED to red
+
         }
         else
         {
             ledState = true;
             leds.setColorRGB(0, 0, 0, 255); // LED to blue
+
         }
         break;
+
     case 6: // GPS access error mode
         if (ledState)
         {
             ledState = false;
             leds.setColorRGB(0, 255, 0, 0); // LED to red
+
         }
         else
         {
             ledState = true;
+<<<<<<< Updated upstream
             leds.setColorRGB(0, 255, 255, 0); // LED to yellow
+=======
+            leds.setColorRGB(0, 255, 127, 0); // LED to yellow
+
+>>>>>>> Stashed changes
         }
         break;
+
     case 7: // captor acess error mode
         if (ledState)
         {
             ledState = false;
             leds.setColorRGB(0, 255, 0, 0); // LED to red
+
         }
         else
         {
             ledState = true;
             leds.setColorRGB(0, 0, 255, 0); // LED to green
+
         }
         break;
+
     case 8: // Data incoherence mode
         if (ledState)
         {
             ledState = false;
             leds.setColorRGB(0, 255, 0, 0); // LED to red
+
         }
         else
         {
             leds.setColorRGB(0, 0, 255, 0); // LED to green
             ledMode = 11;
+
         }
         break;
+<<<<<<< Updated upstream
     case 9: // SD card FULL error mode
+=======
+
+    case 9: // SD card access error mode
+>>>>>>> Stashed changes
         if (ledState)
         {
             ledState = false;
             leds.setColorRGB(0, 255, 0, 0); // LED to red
+
         }
         else
         {
             ledState = true;
             leds.setColorRGB(0, 255, 255, 255); // LED to white
+
         }
         break;
+
     case 10: // SD card access or edit error mode
         if (ledState)
         {
             ledState = false;
             leds.setColorRGB(0, 255, 0, 0); // LED to red
+
         }
         else
         {
             leds.setColorRGB(0, 255, 255, 255); // LED to white
             ledMode = 11;
+
         }
         break;
+<<<<<<< Updated upstream
     case 11: // delay 2x mode 10
             ledState = !ledState;
             ledMode = 10;
@@ -137,11 +171,19 @@ ISR(TIMER1_COMPA_vect) // led state update interrupt
     case 12: // delay 2x mode 8
             ledState = !ledState;
             ledMode = 8;
+=======
+
+    case 11: // delay 2x précedent mode
+            ledState != ledState;
+>>>>>>> Stashed changes
         break;
+
     default:
         leds.setColorRGB(0, 0, 0, 0); // LED to off
         break;
+
     }
+
 }
 
 void RbtnIntPressed()
@@ -153,6 +195,7 @@ void RbtnIntPressed()
     }
 }
 
+<<<<<<< Updated upstream
 void GbtnIntPressed()
 {
     int timePressed = millis(); // get the time the button is pressed
@@ -160,6 +203,10 @@ void GbtnIntPressed()
     {
         Serial.println("RbtnIntPressed 5+");
     }
+=======
+    Serial.println("\nButton interrupt is pressed\n");
+
+>>>>>>> Stashed changes
 }
 
 void checkSensors()
@@ -174,7 +221,10 @@ void checkSensors()
     Serial.println("TEMP : " + String(analogRead(TEMP_PIN)));
     Serial.println("TEMP1 : " + String(analogRead(TEMP_PIN1)));
 
+    Serial.println();
+
     delay(1000);
+
 }
 /*
 void checkSD()
@@ -194,28 +244,22 @@ void checkSD()
     }
 
     delay(1000);
+
 }*/
 
 void checkGPS()
 {
     // Check GPS module
-    unsigned char gpsData[64];
-
-    int i = 0;
-
-    while (GPS.available())
+    while (GPS.available() > 0)
     {
-        gpsData[i++] = GPS.read();
+        gps.encode(GPS.read());
 
-        i+=1;
-
-        if (i == 64) break;
-        
     };
 
-    Serial.print("\nGPS : ");
-    Serial.write(gpsData, i);
-    Serial.print("\n\n");
+    Serial.print("LAT=");  Serial.println(gps.location.lat(), 6);
+    Serial.print("LONG="); Serial.println(gps.location.lng(), 6);
+    Serial.print("ALT=");  Serial.println(gps.altitude.meters());   
+    Serial.println();
 
     delay(1000);
 
@@ -225,14 +269,23 @@ void setup()
 {
     Serial.begin(9600); // initialize the serial communication
 
-    pinMode(GBTN_PIN, INPUT);
+    GPS.begin(9600); // initialize the serial communication with the GPS module
 
-    pinMode(LUM_PIN, OUTPUT);
-    pinMode(LUM_PIN1, OUTPUT);
+    pinMode(GBTN_PIN, INPUT); // initialize the pin for the green button
+ 
+    pinMode(LUM_PIN, OUTPUT); // initialize the pin for the luminosity sensor
+    pinMode(LUM_PIN1, OUTPUT); // 
 
-    pinMode(TEMP_PIN, OUTPUT);
-    pinMode(TEMP_PIN1, OUTPUT);
+    pinMode(TEMP_PIN, OUTPUT); // initialize the pin for the temperature sensor
+    pinMode(TEMP_PIN1, OUTPUT); // 
 
+<<<<<<< Updated upstream
+=======
+    attachInterrupt(digitalPinToInterrupt(RBTN_PIN), btnIntPressed, LOW); // attach interrupt to the red button
+
+    //SD.begin(SDPIN); // initialize the SD card
+
+>>>>>>> Stashed changes
     // Check if the green button is pressed at startup
     if (digitalRead(GBTN_PIN) == LOW)
     {
@@ -243,11 +296,15 @@ void setup()
         delay(1000);
     }
 
+<<<<<<< Updated upstream
     attachInterrupt(digitalPinToInterrupt(RBTN_PIN), RbtnIntPressed, CHANGE);
     attachInterrupt(digitalPinToInterrupt(GBTN_PIN), GbtnIntPressed, CHANGE); // attach interrupt to the green button
 
     SD.begin(SDPIN); // initialize the SD card
     
+=======
+    // Timer configuration
+>>>>>>> Stashed changes
     noInterrupts(); // disable all interrupts
     // initialize timer1
     TCCR1A = 0; // set entire TCCR1A register to 0
@@ -261,6 +318,7 @@ void setup()
 
     Serial.println("\nTest code is running\n");
     interrupts(); // enable all interrupts
+
 }
 
 void loop()
@@ -269,5 +327,10 @@ void loop()
 
     //checkSD(); // check the SD card
 
+<<<<<<< Updated upstream
     // checkGPS(); // check the GPS module
+=======
+    checkGPS(); // check the GPS module
+
+>>>>>>> Stashed changes
 }
