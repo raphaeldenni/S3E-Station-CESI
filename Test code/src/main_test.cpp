@@ -6,6 +6,7 @@
 
 #include <ChainableLED.h>            // Library for the LED strip
 #include <Adafruit_Sensor.h>         // Library for the BME280 sensor
+#include <Adafruit_BusIO_Register.h> // Library for the BME280 sensor
 #include <Adafruit_BME280.h>         // Library for the BME280 sensor
 #include <TinyGPSPlus.h>             // Library for the GPS module
 
