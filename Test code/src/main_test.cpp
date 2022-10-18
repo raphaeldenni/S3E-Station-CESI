@@ -163,19 +163,20 @@ ISR(TIMER1_COMPA_vect) // led state update interrupt
 
 void maintenanceMode()
 {
-    int timePressed = millis();    // initialize the variable for the time the button is pressed
-    while (digitalRead(RBTN_PIN) != HIGH) // if the red button is pressed
+    static int timePressed = millis();    // initialize the variable for the time the button is pressed
+    if (digitalRead(RBTN_PIN)==HIGH)
     {
-        if (millis() - timePressed > 5000) // if the button is pressed for more than 1 second
+        timePressed = millis();
+    }
+    if (millis() - timePressed > 5000) // if the button is pressed for more than 1 second
+    {
+        if (actualMode != MAINTENANCE) // if the LED is not in maintenance mode
         {
-            if (ledMode != MAINTENANCE) // if the LED is not in maintenance mode
-            {
-                ledMode, actualMode = STANDARD; // set the LED to maintenance mode
-            }
-            else // if the LED is in maintenance mode
-            {
-                ledMode, actualMode = MAINTENANCE; // set the LED to the actual mode
-            }
+            ledMode, actualMode = STANDARD; // set the LED to maintenance mode
+        }
+        else // if the LED is in maintenance mode
+        {
+            ledMode, actualMode = MAINTENANCE; // set the LED to the actual mode
         }
     }
 }
