@@ -4,10 +4,10 @@
 #include <SD.h>             // Library for the SD card
 #include <SoftwareSerial.h> // Library for the GPS module
 
-#include <ChainableLED.h>    // Library for the LED strip
-#include <Adafruit_Sensor.h> // Library for the BME280 sensor
-#include <Adafruit_BME280.h> // Library for the BME280 sensor
-#include <TinyGPSPlus.h>     // Library for the GPS module
+#include <ChainableLED.h>            // Library for the LED strip
+#include <Adafruit_Sensor.h>         // Library for the BME280 sensor
+#include <Adafruit_BME280.h>         // Library for the BME280 sensor
+#include <TinyGPSPlus.h>             // Library for the GPS module
 
 #define GBTN_PIN 2 // define the pin for the green button
 #define RBTN_PIN 3 // define the pin for the red button
@@ -19,23 +19,23 @@
 #define LUM_PIN A0  // first luminosity sensor pin
 #define LUM_PIN1 A1 // second luminosity sensor pin
 
-#define BME_CS 10 // define the pin for the BME280 sensor
+#define SEALEVELPRESSURE_HPA (1013.25) // define the sea level pressure
 
 #define SD_PIN 4 // define the pin for the SD card
 
 #define GPS_TX 7 // define the TX pin for the GPS module
 #define GPS_RX 8 // define the RX pin for the GPS module
 
-#define STANDARD 1 // define the value of the standard mode
-#define CONFIGURATION 2  // define the value of the configuration mode
-#define ECONOMY 3  // define the value of the economy mode
-#define MAINTENANCE 4  // define the value of the maintenance mode
-#define ERROR_CLOCK_ACCESS 5  // define the value of the clock error
-#define ERROR_GPS 6  // define the value of the GPS error mode
-#define ERROR_CAPTOR_ACCESS 7  // define the value of the captor acess error mode
+#define STANDARD 1                // define the value of the standard mode
+#define CONFIGURATION 2           // define the value of the configuration mode
+#define ECONOMY 3                 // define the value of the economy mode
+#define MAINTENANCE 4             // define the value of the maintenance mode
+#define ERROR_CLOCK_ACCESS 5      // define the value of the clock error
+#define ERROR_GPS 6               // define the value of the GPS error mode
+#define ERROR_CAPTOR_ACCESS 7     // define the value of the captor acess error mode
 #define ERROR_DATA_INCOHERENCE 8  // define the value of the INCOHERENCE error mode
-#define ERROR_SD_FULL 9  // define the value of the SD card FULL error mode
-#define ERROR_SD_WRITE 10  // define the value of the BME280 access error mode
+#define ERROR_SD_FULL 9           // define the value of the SD card FULL error mode
+#define ERROR_SD_WRITE 10         // define the value of the BME280 access error mode
 
 ChainableLED leds(LED_PIN, LED_DATA_PIN, LEDS_NUM);
 
@@ -202,13 +202,20 @@ void checkSensors()
     Serial.println();
 
     // Check sensors pins
-    byte temp = bme.readTemperature();
+	Serial.print("Temperature in deg C = ");
+	Serial.println(bme.readTemperature());
 
-    Serial.println("Temperature = " + String(temp) + " *C");
+	Serial.print("Pressure in hPa = ");
+	Serial.println(bme.readPressure() / 100.0F);
 
-    Serial.println();
+	Serial.print("Altitude in m = ");
+	Serial.println(bme.readAltitude(SEALEVELPRESSURE_HPA));
 
-    delay(1000);
+	Serial.print("Humidity in %RH = ");
+	Serial.println(bme.readHumidity());
+
+	Serial.println();
+	delay(5000);
 
 }
 
@@ -258,7 +265,7 @@ void setup()
 
     SD.begin(SD_PIN); // initialize the SD card
 
-    bme.begin(0x77); // initialize the BME280 sensor
+    bme.begin(0x76); // initialize the BME280 sensor
 
     if (!bme.begin()) 
     {  
