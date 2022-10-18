@@ -157,34 +157,69 @@ ISR(TIMER1_COMPA_vect) // led state update interrupt
     }
 }
 
-void btnIntPressed() // green button interrupt
+void maintenanceMode()
 {
+    int timePressed = millis(); // get the time the button is pressed
+    if (millis() - timePressed > 5000)
+    {
+        Serial.println("maintenanceMode 5+");
+    }
+}
+
+void ecoMode()
+{
+    int timePressed = millis(); // get the time the button is pressed
+    if (millis() - timePressed > 5000)
+    {
+        Serial.println("maintenanceMode 5+");
+    }
 }
 
 void setup()
 {
-    // put your setup code here, to run once:
-    pinMode(GBTN_PIN, INPUT);
+    Serial.begin(9600); // initialize the serial communication
 
-    pinMode(LUM_PIN, OUTPUT);
-    pinMode(LUM_PIN1, OUTPUT);
+    GPS.begin(9600); // initialize the serial communication with the GPS module
 
-    pinMode(TEMP_PIN, OUTPUT);
-    pinMode(TEMP_PIN1, OUTPUT);
+    pinMode(GBTN_PIN, INPUT); // initialize the pin for the green button
 
-    // initialiser le timer1
+    pinMode(LUM_PIN, OUTPUT);  // initialize the pin for the luminosity sensor
+    pinMode(LUM_PIN1, OUTPUT); //
+
+    pinMode(TEMP_PIN, OUTPUT);  // initialize the pin for the temperature sensor
+    pinMode(TEMP_PIN1, OUTPUT); //
+
+    // SD.begin(SDPIN); // initialize the SD card
+
+    // Check if the green button is pressed at startup
+    if (digitalRead(GBTN_PIN) == LOW)
+    {
+        leds.setColorRGB(0, 0, 255, 0);
+
+        Serial.println("\nButton is pressed\n");
+
+        delay(1000);
+    }
+
+    attachInterrupt(digitalPinToInterrupt(RBTN_PIN), maintenanceMode, CHANGE);
+    attachInterrupt(digitalPinToInterrupt(GBTN_PIN), ecoMode, CHANGE); // attach interrupt to the green button
+
+    SD.begin(SDPIN); // initialize the SD card
+
+    // Timer configuration
+    noInterrupts(); // disable all interrupts
+    // initialize timer1
     TCCR1A = 0; // set entire TCCR1A register to 0
     TCCR1B = 0; // same for TCCR1B
     TCNT1 = 0;  // initialize counter value to 0
 
-    OCR1A = 32000;           // compare match register 16MHz/256/2Hz
+    OCR1A = 64000;           // compare match register 16MHz/256/2Hz
     TCCR1B |= (1 << WGM12);  // CTC mode
     TCCR1B |= (1 << CS12);   // 256 prescaler
     TIMSK1 |= (1 << OCIE1A); // enable timer compare interrupt
 
-    attachInterrupt(digitalPinToInterrupt(RBTN_PIN), btnIntPressed, FALLING);
-
-    Serial.begin(9600); // initialize the serial communication
+    Serial.println("\nTest code is running\n");
+    interrupts(); // enable all interrupts
 }
 
 void loop()
