@@ -1,44 +1,47 @@
-#include <Arduino.h> // Arduino library
-#include <SPI.h>     // Serial Peripheral Interface library for communication with the SD card and GPS module
-#include <SD.h>      // Library for the SD card
+#include <Arduino.h>        // Arduino library
+#include <Wire.h>           // I2C library
+#include <SPI.h>            // Serial Peripheral Interface library for communication with the SD card and GPS module
+#include <SD.h>             // Library for the SD card
 #include <SoftwareSerial.h> // Library for the GPS module
 
 #include <ChainableLED.h>    // Library for the LED strip
+#include <Adafruit_Sensor.h> // Library for the BME280 sensor
 #include <Adafruit_BME280.h> // Library for the BME280 sensor
 #include <TinyGPSPlus.h>     // Library for the GPS module
 
 #define GBTN_PIN 2 // define the pin for the green button
 #define RBTN_PIN 3 // define the pin for the red button
 
-#define LED_PIN 5   // define the pin for the LED
-#define LED_DATA_PIN 6  // initialize the pin for the LED
-#define LEDS_NUM 1 // number of LEDs in the chain
+#define LED_PIN 5       // define the alimentation pin for the LED
+#define LED_DATA_PIN 6  // define the data pin for the LED
+#define LEDS_NUM 1      // number of LEDs in the chain
 
 #define LUM_PIN A0  // first luminosity sensor pin
 #define LUM_PIN1 A1 // second luminosity sensor pin
 
-#define TEMP_PIN A2  // first temperature sensor pin
-#define TEMP_PIN1 A3 // second temperature sensor pin
+#define BME_CS 10 // define the pin for the BME280 sensor
 
-#define SDPIN 4 // define the pin for the SD card
+#define SD_PIN 4 // define the pin for the SD card
 
-#define GPS_RX 7 // define the pin for the GPS module
-#define GPS_TX 8 // define the pin for the GPS module
+#define GPS_TX 7 // define the TX pin for the GPS module
+#define GPS_RX 8 // define the RX pin for the GPS module
 
-#define LED_STANDARD 1 // define the value of the standard mode
-#define LED_CONFIGURATION 2  // define the value of the configuration mode
-#define LED_ECONOMY 3  // define the value of the economy mode
-#define LED_MAINTENANCE 4  // define the value of the maintenance mode
-#define LED_ERROR_CLOCK_ACCESS 5  // define the value of the clock error
-#define LED_ERROR_GPS 6  // define the value of the GPS error mode
-#define LED_ERROR_CAPTOR_ACCESS 7  // define the value of the captor acess error mode
-#define LED_ERROR_DATA_INCOHERENCE 8  // define the value of the INCOHERENCE error mode
-#define LED_ERROR_SD_FULL 9  // define the value of the SD card FULL error mode
-#define LED_ERROR_SD_WRITE 10  // define the value of the BME280 access error mode
+#define STANDARD 1                // define the value of the standard mode
+#define CONFIGURATION 2           // define the value of the configuration mode
+#define ECONOMY 3                 // define the value of the economy mode
+#define MAINTENANCE 4             // define the value of the maintenance mode
+#define ERROR_CLOCK_ACCESS 5      // define the value of the clock error
+#define ERROR_GPS 6               // define the value of the GPS error mode
+#define ERROR_CAPTOR_ACCESS 7     // define the value of the captor acess error mode
+#define ERROR_DATA_INCOHERENCE 8  // define the value of the INCOHERENCE error mode
+#define ERROR_SD_FULL 9           // define the value of the SD card FULL error mode
+#define ERROR_SD_WRITE 10         // define the value of the BME280 access error mode
 
 ChainableLED leds(LED_PIN, LED_DATA_PIN, LEDS_NUM);
 
-SoftwareSerial GPS(GPS_RX, GPS_TX); // initialize the pins for the GPS module
+Adafruit_BME280 bme; // I2C
+
+SoftwareSerial GPS(GPS_TX, GPS_RX); // initialize the pins for the GPS module
 
 TinyGPSPlus gps; // initialize the GPS module
 
@@ -196,16 +199,19 @@ void checkSensors()
 
     delay(1000);
 
-    // Check Temperature sensor pins
-    Serial.println("TEMP : " + String(analogRead(TEMP_PIN)));
-    Serial.println("TEMP1 : " + String(analogRead(TEMP_PIN1)));
+    Serial.println();
+
+    // Check sensors pins
+    byte temp = bme.readTemperature();
+
+    Serial.println("Temperature = " + String(temp) + " *C");
 
     Serial.println();
 
     delay(1000);
 
 }
-/*
+
 void checkSD()
 {
     // Check SD card
@@ -224,7 +230,7 @@ void checkSD()
 
     delay(1000);
 
-}*/
+}
 
 void checkGPS()
 {
@@ -248,6 +254,18 @@ void setup()
 {
     Serial.begin(9600); // initialize the serial communication
 
+    Wire.begin(); // initialize the I2C communication
+
+    SD.begin(SD_PIN); // initialize the SD card
+
+    bme.begin(0x77); // initialize the BME280 sensor
+
+    if (!bme.begin()) 
+    {  
+        Serial.println("Could not find a valid BME280 sensor, check wiring!");
+
+    }
+
     GPS.begin(9600); // initialize the serial communication with the GPS module
 
     pinMode(GBTN_PIN, INPUT); // initialize the pin for the green button
@@ -255,10 +273,7 @@ void setup()
     pinMode(LUM_PIN, OUTPUT); // initialize the pin for the luminosity sensor
     pinMode(LUM_PIN1, OUTPUT); // 
 
-    pinMode(TEMP_PIN, OUTPUT); // initialize the pin for the temperature sensor
-    pinMode(TEMP_PIN1, OUTPUT); // 
-
-    //SD.begin(SDPIN); // initialize the SD card
+    //SD.begin(SD_PIN); // initialize the SD card
 
     // Check if the green button is pressed at startup
     if (digitalRead(GBTN_PIN) == LOW)
@@ -272,8 +287,6 @@ void setup()
 
     attachInterrupt(digitalPinToInterrupt(RBTN_PIN), RbtnIntPressed, CHANGE);
     attachInterrupt(digitalPinToInterrupt(GBTN_PIN), GbtnIntPressed, CHANGE); // attach interrupt to the green button
-
-    SD.begin(SDPIN); // initialize the SD card
     
     // Timer configuration
     noInterrupts(); // disable all interrupts
@@ -294,7 +307,8 @@ void setup()
 
 void loop()
 {
-    // checkSensors(); // check the multi-sensor
+    checkSensors(); // check the multi-sensor
     //checkSD(); // check the SD card
-    checkGPS(); // check the GPS module
+    //checkGPS(); // check the GPS module
+
 }

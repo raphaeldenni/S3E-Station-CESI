@@ -51,7 +51,7 @@ void setup()
     pinMode(LUM_PIN, OUTPUT);
     pinMode(LUM_PIN1, OUTPUT);
 
-    pinMode(TEMP_PIN, OUTPUT);
+    pinMode(SENSOR_SCL_PIN, OUTPUT);
     pinMode(TEMP_PIN1, OUTPUT);
 
     // initialiser le timer1
