@@ -6,10 +6,10 @@
 #include <ChainableLED.h>    // Library for the LED strip
 #include <Adafruit_BME280.h> // Library for the BME280 sensor
 
-#define GBTN_PIN 2 // initialize the pin for the green button
-#define RBTN_PIN 3 // initialize the pin for the red button
+#define GBTN_PIN 2 // define the pin for the green button
+#define RBTN_PIN 3 // define the pin for the red button
 
-#define LED_PIN 5   // initialize the pin for the LED
+#define LED_PIN 5   // define the pin for the LED
 #define LED_DATA_PIN 6  // initialize the pin for the LED
 #define LEDS_NUM 1 // number of LEDs in the chain
 
@@ -19,16 +19,28 @@
 #define TEMP_PIN A2  // first temperature sensor pin
 #define TEMP_PIN1 A3 // second temperature sensor pin
 
-#define SDPIN 4 // initialize the pin for the SD card
+#define SDPIN 4 // define the pin for the SD card
 
-#define GPS_RX 7 // initialize the pin for the GPS module
-#define GPS_TX 8 // initialize the pin for the GPS module
+#define GPS_RX 7 // define the pin for the GPS module
+#define GPS_TX 8 // define the pin for the GPS module
+
+#define LED_STANDARD 1 // define the value of the standard mode
+#define LED_CONFIGURATION 2  // define the value of the configuration mode
+#define LED_ECONOMY 3  // define the value of the economy mode
+#define LED_MAINTENANCE 4  // define the value of the maintenance mode
+#define LED_ERROR_CLOCK_ACCESS 5  // define the value of the clock error
+#define LED_ERROR_GPS 6  // define the value of the GPS error mode
+#define LED_ERROR_CAPTOR_ACCESS 7  // define the value of the captor acess error mode
+#define LED_ERROR_DATA_INCOHERENCE 8  // define the value of the INCOHERENCE error mode
+#define LED_ERROR_SD_FULL 9  // define the value of the SD card FULL error mode
+#define LED_ERROR_SD_WRITE 10  // define the value of the BME280 access error mode
 
 ChainableLED leds(LED_PIN, LED_DATA_PIN, LEDS_NUM);
 
 SoftwareSerial GPS(GPS_RX, GPS_TX); // initialize the pins for the GPS module
 
 int ledMode = 0; // initialize the variable for the LED mode
+int timePressed = 0; // initialize the variable for the time the button is pressed
 
 ISR(TIMER1_COMPA_vect) // led state update interrupt
 {
@@ -45,7 +57,7 @@ ISR(TIMER1_COMPA_vect) // led state update interrupt
         leds.setColorRGB(0, 0, 0, 255); // LED to blue
         break;
     case 4: // maintenance mode
-        leds.setColorRGB(0, 255, 127, 0); // LED to orange
+        leds.setColorRGB(0, 255, 64, 0); // LED to orange
         break;
     case 5: // clock access error mode
         if (ledState)
@@ -68,7 +80,7 @@ ISR(TIMER1_COMPA_vect) // led state update interrupt
         else
         {
             ledState = true;
-            leds.setColorRGB(0, 255, 127, 0); // LED to yellow
+            leds.setColorRGB(0, 255, 255, 0); // LED to yellow
         }
         break;
     case 7: // captor acess error mode
@@ -95,7 +107,7 @@ ISR(TIMER1_COMPA_vect) // led state update interrupt
             ledMode = 11;
         }
         break;
-    case 9: // SD card access error mode
+    case 9: // SD card FULL error mode
         if (ledState)
         {
             ledState = false;
@@ -119,8 +131,13 @@ ISR(TIMER1_COMPA_vect) // led state update interrupt
             ledMode = 11;
         }
         break;
-    case 11: // delay 2x précedent mode
+    case 11: // delay 2x mode 10
             ledState = !ledState;
+            ledMode = 10;
+        break;
+    case 12: // delay 2x mode 8
+            ledState = !ledState;
+            ledMode = 8;
         break;
     default:
         leds.setColorRGB(0, 0, 0, 0); // LED to off
@@ -130,14 +147,30 @@ ISR(TIMER1_COMPA_vect) // led state update interrupt
 
 void RbtnIntPressed()
 {
-    ledMode++;
-    Serial.println(ledMode);
+    if (digitalRead(RBTN_PIN) == LOW)
+        if (millis() - timePressed > 5000)
+        {
+            timePressed = 0;
+            Serial.println("RbtnIntPressed 5+");
+        }
+    else
+    {
+        timePressed = 0;
+    }
 }
 
 void GbtnIntPressed()
 {
-    ledMode = 0;
-    Serial.println(ledMode);
+    if (digitalRead(GBTN_PIN) == LOW)
+        if (millis() - timePressed > 5000)
+        {
+            timePressed = 0;
+            Serial.println("GbtnIntPressed 5+");
+        }
+    else
+    {
+        timePressed = 0;
+    }
 }
 
 void checkSensors()
@@ -221,8 +254,8 @@ void setup()
         delay(1000);
     }
 
-    attachInterrupt(digitalPinToInterrupt(RBTN_PIN), RbtnIntPressed, RISING); // attach interrupt to the green button
-    attachInterrupt(digitalPinToInterrupt(GBTN_PIN), GbtnIntPressed, FALLING); // attach interrupt to the green button
+    attachInterrupt(digitalPinToInterrupt(RBTN_PIN), RbtnIntPressed, CHANGE);
+    attachInterrupt(digitalPinToInterrupt(GBTN_PIN), GbtnIntPressed, CHANGE); // attach interrupt to the green button
 
     SD.begin(SDPIN); // initialize the SD card
     
@@ -243,9 +276,9 @@ void setup()
 
 void loop()
 {
-    checkSensors(); // check the multi-sensor
+    // checkSensors(); // check the multi-sensor
 
     //checkSD(); // check the SD card
 
-    checkGPS(); // check the GPS module
+    // checkGPS(); // check the GPS module
 }
