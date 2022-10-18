@@ -269,10 +269,10 @@ void setup()
 
     GPS.begin(9600); // initialize the serial communication with the GPS module
 
-    pinled(GBTN_PIN, INPUT); // initialize the pin for the green button
+    pinMode(GBTN_PIN, INPUT); // initialize the pin for the green button
 
-    pinled(LUM_PIN, OUTPUT);  // initialize the pin for the luminosity sensor
-    pinled(LUM_PIN1, OUTPUT); //
+    pinMode(LUM_PIN, OUTPUT);  // initialize the pin for the luminosity sensor
+    pinMode(LUM_PIN1, OUTPUT); //
 
     //SD.begin(SD_PIN); // initialize the SD card
 
