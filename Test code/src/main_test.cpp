@@ -114,7 +114,7 @@ ISR(TIMER1_COMPA_vect) // led state update interrupt
         }
         break;
     case 11: // delay 2x précedent mode
-            ledState != ledState;
+            ledState = !ledState;
         break;
     default:
         leds.setColorRGB(0, 0, 0, 0); // LED to off
@@ -122,11 +122,16 @@ ISR(TIMER1_COMPA_vect) // led state update interrupt
     }
 }
 
-void btnIntPressed()
+void RbtnIntPressed()
 {
-    leds.setColorRGB(0, 0, 0, 255);
+    ledMode++;
+    Serial.println(ledMode);
+}
 
-    Serial.println("\nButton interrupt is pressed\n");
+void GbtnIntPressed()
+{
+    ledMode = 0;
+    Serial.println(ledMode);
 }
 
 void checkSensors()
@@ -175,10 +180,6 @@ void setup()
     pinMode(TEMP_PIN, OUTPUT);
     pinMode(TEMP_PIN1, OUTPUT);
 
-    attachInterrupt(digitalPinToInterrupt(RBTN_PIN), btnIntPressed, LOW); // attach interrupt to the green button
-
-    SD.begin(SDPIN); // initialize the SD card
-
     // Check if the green button is pressed at startup
     if (digitalRead(GBTN_PIN) == LOW)
     {
@@ -188,6 +189,12 @@ void setup()
 
         delay(1000);
     }
+
+    attachInterrupt(digitalPinToInterrupt(RBTN_PIN), RbtnIntPressed, RISING); // attach interrupt to the green button
+    attachInterrupt(digitalPinToInterrupt(GBTN_PIN), GbtnIntPressed, FALLING); // attach interrupt to the green button
+
+    SD.begin(SDPIN); // initialize the SD card
+    
     noInterrupts(); // disable all interrupts
     // initialize timer1
     TCCR1A = 0; // set entire TCCR1A register to 0
