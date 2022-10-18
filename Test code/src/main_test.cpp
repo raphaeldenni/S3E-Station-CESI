@@ -46,8 +46,9 @@ SoftwareSerial GPS(GPS_TX, GPS_RX); // initialize the pins for the GPS module
 
 TinyGPSPlus gps; // initialize the GPS module
 
-int ledMode = 0;    // initialize the variable for the LED mode
-int actualMode = 0; // initialize the variable for the actual mode
+int ledMode = STANDARD;    // initialize the variable to store the LED mode
+int actualMode = STANDARD; // initialize the variable to store the actual mode
+int precedentMode = STANDARD; // initialize the variable to store the precedent mode
 
 ISR(TIMER1_COMPA_vect) // led state update interrupt
 {
@@ -165,20 +166,26 @@ ISR(TIMER1_COMPA_vect) // led state update interrupt
 void maintenanceMode()
 {
     static int timePressed = millis();    // initialize the variable for the time the button is pressed
-    if (digitalRead(RBTN_PIN)==HIGH)
+    if ((digitalRead(RBTN_PIN)==HIGH) || (timePressed == 0))
     {
         timePressed = millis();
     }
-    if (millis() - timePressed > 5000) // if the button is pressed for more than 1 second
+    else if (millis() - timePressed > 5000) // if the button is pressed for more than 1 second
     {
         if (actualMode != MAINTENANCE) // if the LED is not in maintenance mode
         {
-            ledMode, actualMode = STANDARD; // set the LED to maintenance mode
+            ledMode, actualMode = precedentMode; // set the LED to maintenance mode
+            precedentMode = MAINTENANCE;
         }
         else // if the LED is in maintenance mode
         {
+            precedentMode = actualMode;
             ledMode, actualMode = MAINTENANCE; // set the LED to the actual mode
         }
+    }
+    else
+    {
+        timePressed = 0;
     }
 }
 
@@ -290,7 +297,7 @@ void setup()
     }
 
     attachInterrupt(digitalPinToInterrupt(RBTN_PIN), maintenanceMode, CHANGE);
-    attachInterrupt(digitalPinToInterrupt(GBTN_PIN), ecoMode, LOW); // attach interrupt to the green button
+    attachInterrupt(digitalPinToInterrupt(GBTN_PIN), ecoMode, CHANGE); // attach interrupt to the green button
 
     SD.begin(SD_PIN); // initialize the SD card
     
