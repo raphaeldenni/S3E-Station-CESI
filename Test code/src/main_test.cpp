@@ -33,21 +33,104 @@ int ledMode = 0; // initialize the variable for the LED mode
 ISR(TIMER1_COMPA_vect) // led state update interrupt
 {
     static bool ledState = false;
-    if (ledState == true) // if the LED mode is 1
+    switch (ledMode)
     {
-        ledState = !ledState; // change the LED state
-        leds.setColorRGB(0, 0, 0, 0); // set the LED color to black
-    }
-    if (ledState == false) // if the LED mode is 0
-    {
-        ledState = !ledState; // change the LED state
-        leds.setColorRGB(0, 255, 0, 0); // set the LED color to green
+    case 1: // standard mode
+        leds.setColorRGB(0, 0, 255, 0); // LED to green
+        break;
+    case 2: // configuration mode
+        leds.setColorRGB(0, 255, 255, 0); // LED to yellow
+        break;
+    case 3: // economy mode
+        leds.setColorRGB(0, 0, 0, 255); // LED to blue
+        break;
+    case 4: // maintenance mode
+        leds.setColorRGB(0, 255, 127, 0); // LED to orange
+        break;
+    case 5: // clock access error mode
+        if (ledState)
+        {
+            ledState = false;
+            leds.setColorRGB(0, 255, 0, 0); // LED to red
+        }
+        else
+        {
+            ledState = true;
+            leds.setColorRGB(0, 0, 0, 255); // LED to blue
+        }
+        break;
+    case 6: // GPS access error mode
+        if (ledState)
+        {
+            ledState = false;
+            leds.setColorRGB(0, 255, 0, 0); // LED to red
+        }
+        else
+        {
+            ledState = true;
+            leds.setColorRGB(0, 255, 127, 0); // LED to yellow
+        }
+        break;
+    case 7: // captor acess error mode
+        if (ledState)
+        {
+            ledState = false;
+            leds.setColorRGB(0, 255, 0, 0); // LED to red
+        }
+        else
+        {
+            ledState = true;
+            leds.setColorRGB(0, 0, 255, 0); // LED to green
+        }
+        break;
+    case 8: // Data incoherence mode
+        if (ledState)
+        {
+            ledState = false;
+            leds.setColorRGB(0, 255, 0, 0); // LED to red
+        }
+        else
+        {
+            leds.setColorRGB(0, 0, 255, 0); // LED to green
+            ledMode = 11;
+        }
+        break;
+    case 9: // SD card access error mode
+        if (ledState)
+        {
+            ledState = false;
+            leds.setColorRGB(0, 255, 0, 0); // LED to red
+        }
+        else
+        {
+            ledState = true;
+            leds.setColorRGB(0, 255, 255, 255); // LED to white
+        }
+        break;
+    case 10: // SD card access or edit error mode
+        if (ledState)
+        {
+            ledState = false;
+            leds.setColorRGB(0, 255, 0, 0); // LED to red
+        }
+        else
+        {
+            leds.setColorRGB(0, 255, 255, 255); // LED to white
+            ledMode = 11;
+        }
+        break;
+    case 11: // delay 2x précedent mode
+            ledState != ledState;
+        break;
+    default:
+        leds.setColorRGB(0, 0, 0, 0); // LED to off
+        break;
     }
 }
 
 void btnIntPressed()
 {
-    leds.setColorRGB(255, 0, 0, 0);
+    leds.setColorRGB(0, 0, 0, 255);
 
     Serial.println("\nButton interrupt is pressed\n");
 }
@@ -142,7 +225,7 @@ void setup()
     TCCR1B = 0; // same for TCCR1B
     TCNT1 = 0;  // initialize counter value to 0
 
-    OCR1A = 32000;           // compare match register 16MHz/256/2Hz
+    OCR1A = 64000;           // compare match register 16MHz/256/2Hz
     TCCR1B |= (1 << WGM12);  // CTC mode
     TCCR1B |= (1 << CS12);   // 256 prescaler
     TIMSK1 |= (1 << OCIE1A); // enable timer compare interrupt
