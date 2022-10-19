@@ -16,15 +16,6 @@
 #define ORANGE 0, 255, 50, 0
 #define WHITE 0, 255, 255, 255
 
-// variables non-modifiables par l'utilisateur
-struct modeVar
-{
-    int actual = STANDARD;   // define the mode of the program
-    int previous = STANDARD; // define the previous mode of the program
-    int rBtntimePressed = 0; // define the pin for the red button
-    int gBtntimePressed = 0; // define the pin for the green button
-    int ledMode = STANDARD;
-};
 // Variables modifiables par l'utilisateur
 struct config
 {
