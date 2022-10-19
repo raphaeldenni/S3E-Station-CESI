@@ -9,6 +9,7 @@
 #include <Adafruit_I2CDevice.h> // Library for the BME280 sensor
 #include <Adafruit_BME280.h>    // Library for the BME280 sensor
 #include <TinyGPSPlus.h>        // Library for the GPS module
+#include "DS1307.h"             // Library for the RTC module
 
 #define GBTN_PIN 2 // define the pin for the green button
 #define RBTN_PIN 3 // define the pin for the red button
@@ -18,7 +19,7 @@
 #define LEDS_NUM 1      // number of LEDs in the chain
 
 #define LUM_DATA_PIN A0  // first luminosity sensor pin
-#define LUM_PIN A1 // second luminosity sensor pin
+#define SECOND_LUM_PIN A1 // second luminosity sensor pin
 
 #define BME_ADDRESS 0x76 // define the BME280 sensor address
 #define REFRESH_DELAY 1500 // define the delay between each refresh of the data
@@ -37,6 +38,8 @@ Adafruit_BME280 bme; // initialize I2C communication for the bme280 sensor
 SoftwareSerial ss(RX_TO_GPS, TX_TO_GPS); // initialize the pins for the GPS module
 
 TinyGPSPlus gps; // initialize the GPS module
+
+DS1307 clock; // initialize the RTC module
 
 ISR(TIMER1_COMPA_vect) // led state update interrupt
 {
@@ -62,7 +65,7 @@ void checkSensors()
 {
     // Check Luminosity sensor pins
     Serial.println("Luminosity : " + String(analogRead(LUM_DATA_PIN)*100.0/1023.0) + "%");
-    Serial.println("LUM1 : " + String(analogRead(LUM_PIN)));
+    Serial.println("LUM1 : " + String(analogRead(SECOND_LUM_PIN)));
 
     Serial.println();
 
@@ -146,6 +149,63 @@ void checkGPS()
 
 }
 
+void checkRTC()
+{
+    // Check RTC module
+    clock.getTime();
+
+    Serial.print("Datetime: ");
+
+    Serial.print(clock.hour, DEC);
+    Serial.print(":");
+
+    Serial.print(clock.minute, DEC);
+    Serial.print(":");
+
+    Serial.print(clock.second, DEC);
+    Serial.print("  ");
+
+    Serial.print(clock.month, DEC);
+    Serial.print("/");
+
+    Serial.print(clock.dayOfMonth, DEC);
+    Serial.print("/");
+
+    Serial.print(clock.year+2000, DEC);
+    Serial.print(" ");
+
+    Serial.print(clock.dayOfMonth);
+    Serial.print("*");
+
+    switch (clock.dayOfWeek)// Friendly printout the weekday
+    {
+        case MON:
+        Serial.print("MON");
+        break;
+        case TUE:
+        Serial.print("TUE");
+        break;
+        case WED:
+        Serial.print("WED");
+        break;
+        case THU:
+        Serial.print("THU");
+        break;
+        case FRI:
+        Serial.print("FRI");
+        break;
+        case SAT:
+        Serial.print("SAT");
+        break;
+        case SUN:
+        Serial.print("SUN");
+        break;
+    }
+
+    Serial.println("\n");
+
+}
+
 void setup()
 {
     Serial.begin(9600); // initialize the serial communication
@@ -167,10 +227,24 @@ void setup()
 
     ss.begin(GPS_BAUD); // initialize the serial communication with the GPS module
 
+    clock.begin(); // initialize the RTC module
+
+    // WARNING ZONE : the following code change datetime of the RTC clock module. If the module is already set, don't use it.
+
+    /*
+    clock.fillDayOfWeek(WED); // set the day of the week
+
+    clock.fillByHMS(16,05,00); // delay of 18 seconds (for 16:00 click the upload button at 15:42)
+
+    clock.setTime();
+    */
+
+   // END WARNING ZONE
+    
     pinMode(GBTN_PIN, INPUT); // initialize the pin for the green button
 
     pinMode(LUM_DATA_PIN, OUTPUT);  // initialize the pin for the luminosity sensor
-    pinMode(LUM_PIN, OUTPUT); //
+    pinMode(SECOND_LUM_PIN, OUTPUT); //
 
     // Check if the green button is pressed at startup
     if (digitalRead(GBTN_PIN) == LOW)
@@ -207,5 +281,6 @@ void loop()
     checkSensors(); // check the multi-sensor
     checkSD();      // check the SD card
     //checkGPS();     // check the GPS module
+    checkRTC();     // check the RTC module
 
 }
