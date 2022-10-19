@@ -28,7 +28,6 @@ ISR(TIMER1_COMPA_vect) // check if button is pressed
 void setup()
 {
     Serial.begin(9600); // initialize the serial communication
-    // Check if the green button is pressed at startup
     if (digitalRead(GBTN_PIN) == LOW)
     {
         leds.setColorRGB(0, 0, 255, 0);
