@@ -9,6 +9,12 @@
 #define ERROR_SD_FULL 9          // define the value of the SD card FULL error mode
 #define ERROR_SD_WRITE 10        // define the value of the BME280 access error mode
 
+#define RED 0, 255, 0, 0
+#define GREEN 0, 0, 255, 0
+#define BLUE 0, 0, 0, 255
+#define YELLOW 0, 255, 255, 0
+#define ORANGE 0, 255, 100, 0
+
 // variables non-modifiables par l'utilisateur
 struct modeVar
 {
