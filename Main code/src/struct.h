@@ -1,20 +1,4 @@
-#define STANDARD 1               // define the value of the standard mode
-#define CONFIGURATION 2          // define the value of the configuration mode
-#define ECONOMY 3                // define the value of the economy mode
-#define MAINTENANCE 4            // define the value of the maintenance mode
-#define ERROR_CLOCK_ACCESS 5     // define the value of the clock error
-#define ERROR_GPS 6              // define the value of the GPS error mode
-#define ERROR_CAPTOR_ACCESS 7    // define the value of the captor acess error mode
-#define ERROR_DATA_INCOHERENCE 8 // define the value of the INCOHERENCE error mode
-#define ERROR_SD_FULL 9          // define the value of the SD card FULL error mode
-#define ERROR_SD_WRITE 10        // define the value of the BME280 access error mode
-
-#define RED 0, 255, 0, 0
-#define GREEN 0, 0, 255, 0
-#define BLUE 0, 0, 0, 255
-#define YELLOW 0, 255, 255, 0
-#define ORANGE 0, 255, 50, 0
-#define WHITE 0, 255, 255, 255
+// Structure file for the main program
 
 struct modeVar
 {
@@ -28,10 +12,11 @@ struct modeVar
 
 struct sensorsData
 {
-    float luminosity = 0; // define the luminosity value
+    float luminosity = 0;  // define the luminosity value
     float temperature = 0; // define the temperature value
-    float humidity = 0;   // define the humidity value
-    float pressure = 0;   // define the pressure value
+    float humidity = 0;    // define the humidity value
+    float pressure = 0;    // define the pressure value
+    float altitude = 0;    // define the altitude value
 
 };
 
@@ -45,12 +30,12 @@ struct gpsData
 
 struct rtcData
 {
-    int year;   // define the year value
-    int month;  // define the month value
-    int day;    // define the day value
-    int hour;   // define the hour value
-    int minute; // define the minute value
-    int second; // define the second value
+    int year = 2000; // define the year value
+    int month = 1;   // define the month value
+    int day = 1;     // define the day value
+    int hour = 0;    // define the hour value
+    int minute = 0;  // define the minute value
+    int second = 0;  // define the second value
 
 };
 
