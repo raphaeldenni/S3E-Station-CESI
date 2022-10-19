@@ -13,7 +13,7 @@
 #define LED_DATA_PIN 6 // define the data pin for the LED
 #define LEDS_NUM 1     // number of LEDs in the chain
 
-#define LED_UPDATE_INTERVAL 31250 // define the time between each LED update 62500 = 1s
+#define LED_UPDATE_INTERVAL 31250 // define the time between each LED update 62500 = 1s, Value is between 0 and 62500
 
 ChainableLED leds(LED_PIN, LED_DATA_PIN, LEDS_NUM);
 
@@ -21,14 +21,40 @@ struct modeVar modeVar; // define the configuration structure
 struct config config;   // define the configuration structure
 
 ISR(TIMER1_COMPA_vect) // check if button is pressed
-{   
+{
+    static int state = 0;
     // LED update
     switch (modeVar.ledMode)
     {
-    case (MAINTENANCE, ECONOMY, STANDARD):
-        leds.setColorRGB(RED);
+    case (ERROR_CAPTOR_ACCESS, ERROR_GPS, ERROR_CLOCK_ACCESS, ERROR_SD_FULL):
+        if (state <= 0)
+        {
+            leds.setColorRGB(RED);
+            state += (62500 / LED_UPDATE_INTERVAL);
+        }
+        if (state >= 1)// 1s
+        {
+            if (ERROR_CAPTOR_ACCESS) leds.setColorRGB(GREEN);
+            if (ERROR_GPS) leds.setColorRGB(YELLOW);
+            if (ERROR_CLOCK_ACCESS) leds.setColorRGB(BLUE);
+            if (ERROR_SD_FULL) leds.setColorRGB(WHITE);
+            state -= (62500 / LED_UPDATE_INTERVAL);
+        }
         break;
-    
+    case (ERROR_SD_WRITE, ERROR_DATA_INCOHERENCE):
+        if (state <= 0)
+        {
+            leds.setColorRGB(RED);
+            state += (62500 / LED_UPDATE_INTERVAL);
+        }
+        if (state >= 1)// 1s
+        {
+            if (ERROR_SD_WRITE) leds.setColorRGB(WHITE);
+            if (ERROR_DATA_INCOHERENCE) leds.setColorRGB(GREEN);
+            state -= (62500 / LED_UPDATE_INTERVAL / 2);
+        }
+        leds.setColorRGB(ORANGE);
+        break;
     default:
         if (modeVar.ledMode == MAINTENANCE) leds.setColorRGB(ORANGE);
         if (modeVar.ledMode == ECONOMY) leds.setColorRGB(BLUE);

@@ -14,6 +14,7 @@
 #define BLUE 0, 0, 0, 255
 #define YELLOW 0, 255, 255, 0
 #define ORANGE 0, 255, 50, 0
+#define WHITE 0, 255, 255, 255
 
 // variables non-modifiables par l'utilisateur
 struct modeVar
