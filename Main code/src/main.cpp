@@ -17,12 +17,21 @@
 
 ChainableLED leds(LED_PIN, LED_DATA_PIN, LEDS_NUM);
 
+struct modeVar
+{
+    int actual = STANDARD;   // define the mode of the program
+    int previous = STANDARD; // define the previous mode of the program
+    int rBtntimePressed = 0; // define the pin for the red button
+    int gBtntimePressed = 0; // define the pin for the green button
+    int ledMode = STANDARD;
+};
+
 struct modeVar modeVar; // define the configuration structure
 struct config config;   // define the configuration structure
 
 ISR(TIMER1_COMPA_vect) // check if button is pressed
 {
-    static int state = 0;
+    static float state = 0;
     // LED update
     switch (modeVar.ledMode)
     {
@@ -53,7 +62,6 @@ ISR(TIMER1_COMPA_vect) // check if button is pressed
             if (ERROR_DATA_INCOHERENCE) leds.setColorRGB(GREEN);
             state -= (62500 / LED_UPDATE_INTERVAL / 2);
         }
-        leds.setColorRGB(ORANGE);
         break;
     default:
         if (modeVar.ledMode == MAINTENANCE) leds.setColorRGB(ORANGE);
@@ -142,4 +150,6 @@ void loop()
 {
     // Get DATA
     // Store DATA
+    delay(5000);
+    modeVar.ledMode++;
 }
