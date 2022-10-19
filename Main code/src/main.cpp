@@ -21,12 +21,11 @@ struct modeVar modeVar; // define the configuration structure
 struct config config;   // define the configuration structure
 
 ISR(TIMER1_COMPA_vect) // check if button is pressed
-{
+{   
     // LED update
-    modeVar.ledMode = modeVar.actual;
-    if (modeVar.ledMode == MAINTENANCE) leds.setColorRGB(ORANGE);
-    if (modeVar.ledMode == ECONOMY) leds.setColorRGB(BLUE);
-    if (modeVar.ledMode == STANDARD)leds.setColorRGB(GREEN);
+    
+
+    
     // Button update
     if (digitalRead(RBTN_PIN) == LOW)
     {
