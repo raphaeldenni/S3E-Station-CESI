@@ -9,13 +9,18 @@
 #define ERROR_SD_FULL 9          // define the value of the SD card FULL error mode
 #define ERROR_SD_WRITE 10        // define the value of the BME280 access error mode
 
-struct config
-{
-    int timeWait = 10000; // define the time to wait in milliseconds between each capture
-};
-
-struct mode
+// variables non-modifiables par l'utilisateur
+struct modeVar
 {
     int actual = STANDARD;   // define the mode of the program
     int previous = STANDARD; // define the previous mode of the program
+    int rBtntimePressed = 0; // define the pin for the red button
+    int gBtntimePressed = 0; // define the pin for the green button
+    int ledMode = STANDARD;
+};
+// Variables modifiables par l'utilisateur
+struct config
+{
+    int timeWait = 10000; // define the time to wait in milliseconds between each capture
+    int timeToSwitch = 5;
 };
