@@ -4,9 +4,11 @@
 #include <SD.h>             // Library for the SD card
 #include <SoftwareSerial.h> // Library for the GPS module
 
-#include <ChainableLED.h>            // Library for the LED strip
-#include <Adafruit_BME280.h>         // Library for the BME280 sensor
-#include <TinyGPSPlus.h>             // Library for the GPS module
+#include <ChainableLED.h>       // Library for the LED strip
+#include <Adafruit_Sensor.h>    // Library for the BME280 sensor
+#include <Adafruit_I2CDevice.h> // Library for the BME280 sensor
+#include <Adafruit_BME280.h>    // Library for the BME280 sensor
+#include <TinyGPSPlus.h>        // Library for the GPS module
 
 #define GBTN_PIN 2 // define the pin for the green button
 #define RBTN_PIN 3 // define the pin for the red button
@@ -20,7 +22,7 @@
 
 #define BME_ADDRESS 0x76 // define the BME280 sensor address
 #define REFRESH_DELAY 1500 // define the delay between each refresh of the data
-#define SEALEVELPRESSURE_HPA (1024.90) // define the sea level pressure
+#define SEALEVELPRESSURE_HPA 1024.90 // define the sea level pressure
 
 #define SD_PIN 4 // define the pin for the SD card
 
@@ -37,7 +39,7 @@ TinyGPSPlus gps; // initialize the GPS module
 
 ISR(TIMER1_COMPA_vect) // led state update interrupt
 {
-    Serial.println("\nTick\n");
+    //Serial.println("\nTick\n");
 }
 
 void redPressed()
@@ -137,7 +139,7 @@ void setup()
 
     SD.begin(SD_PIN); // initialize the SD card
 
-    bme.begin(BME280_ADDRESS); // initialize the BME280 sensor
+    bme.begin(BME_ADDRESS); // initialize the BME280 sensor
 
     /*
     // initialize the BME280 sensor
