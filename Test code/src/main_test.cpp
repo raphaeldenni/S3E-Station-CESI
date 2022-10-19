@@ -17,8 +17,8 @@
 #define LED_DATA_PIN 6  // define the data pin for the LED
 #define LEDS_NUM 1      // number of LEDs in the chain
 
-#define LUM_PIN A0  // first luminosity sensor pin
-#define LUM_PIN1 A1 // second luminosity sensor pin
+#define LUM_DATA_PIN A0  // first luminosity sensor pin
+#define LUM_PIN A1 // second luminosity sensor pin
 
 #define BME_ADDRESS 0x76 // define the BME280 sensor address
 #define REFRESH_DELAY 1500 // define the delay between each refresh of the data
@@ -26,20 +26,22 @@
 
 #define SD_PIN 4 // define the pin for the SD card
 
-#define GPS_TX 7 // define the TX pin for the GPS module
-#define GPS_RX 8 // define the RX pin for the GPS module
+#define TX_TO_GPS 8 // define the TX pin for the GPS module
+#define RX_TO_GPS 7 // define the RX pin for the GPS module
+#define GPS_BAUD 9600 // define the baud rate for the GPS module
 
 ChainableLED leds(LED_PIN, LED_DATA_PIN, LEDS_NUM);
 
 Adafruit_BME280 bme; // initialize I2C communication for the bme280 sensor
 
-SoftwareSerial GPS(GPS_TX, GPS_RX); // initialize the pins for the GPS module
+SoftwareSerial ss(RX_TO_GPS, TX_TO_GPS); // initialize the pins for the GPS module
 
 TinyGPSPlus gps; // initialize the GPS module
 
 ISR(TIMER1_COMPA_vect) // led state update interrupt
 {
     //Serial.println("\nTick\n");
+
 }
 
 void redPressed()
@@ -53,17 +55,18 @@ void greenPressed()
 {
     leds.setColorRGB(0, 0, 255, 0);
     Serial.println("Green button pressed");
+
 }
 
 void checkSensors()
 {
     // Check Luminosity sensor pins
-    Serial.println("LUM : " + String(analogRead(LUM_PIN)));
-    Serial.println("LUM1 : " + String(analogRead(LUM_PIN1)));
-
-    delay(1000);
+    Serial.println("Luminosity : " + String(analogRead(LUM_DATA_PIN)*100.0/1023.0) + "%");
+    Serial.println("LUM1 : " + String(analogRead(LUM_PIN)));
 
     Serial.println();
+
+    delay(1000);
 
     // Check sensors pins
     // Affichage de la TEMPÉRATURE
@@ -115,20 +118,32 @@ void checkSD()
 void checkGPS()
 {
     // Check GPS module
-    while (GPS.available() > 0)
+    while (ss.available() > 0)
     {
-        gps.encode(GPS.read());
+        gps.encode(ss.read());
+
+        Serial.print(F("\nLocation: ")); 
+
+        if (gps.location.isValid())
+        {
+            Serial.print(gps.location.lat(), 6);
+            Serial.print(F(","));
+            Serial.print(gps.location.lng(), 6);
+            break;
+
+        } 
+        else
+        {
+            Serial.print(F("INVALID"));
+
+        };
+
+        Serial.println();
+
     };
 
-    Serial.print("LAT=");
-    Serial.println(gps.location.lat(), 6);
-    Serial.print("LONG=");
-    Serial.println(gps.location.lng(), 6);
-    Serial.print("ALT=");
-    Serial.println(gps.altitude.meters());
-    Serial.println();
-
     delay(1000);
+
 }
 
 void setup()
@@ -150,12 +165,12 @@ void setup()
     }
     */
 
-    GPS.begin(9600); // initialize the serial communication with the GPS module
+    ss.begin(GPS_BAUD); // initialize the serial communication with the GPS module
 
     pinMode(GBTN_PIN, INPUT); // initialize the pin for the green button
 
-    pinMode(LUM_PIN, OUTPUT);  // initialize the pin for the luminosity sensor
-    pinMode(LUM_PIN1, OUTPUT); //
+    pinMode(LUM_DATA_PIN, OUTPUT);  // initialize the pin for the luminosity sensor
+    pinMode(LUM_PIN, OUTPUT); //
 
     // Check if the green button is pressed at startup
     if (digitalRead(GBTN_PIN) == LOW)
@@ -190,7 +205,7 @@ void setup()
 void loop()
 {
     checkSensors(); // check the multi-sensor
-    // checkSD();      // check the SD card
-    // checkGPS();     // check the GPS module
+    checkSD();      // check the SD card
+    //checkGPS();     // check the GPS module
 
 }
