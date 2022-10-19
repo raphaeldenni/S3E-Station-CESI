@@ -53,7 +53,10 @@ ISR(TIMER1_COMPA_vect) // check if button is pressed
     // LED update
     switch (modeVar.ledMode)
     {
-    case (ERROR_CAPTOR_ACCESS, ERROR_GPS, ERROR_CLOCK_ACCESS, ERROR_SD_FULL):
+    case ERROR_CAPTOR_ACCESS:
+    case ERROR_GPS:
+    case ERROR_CLOCK_ACCESS:
+    case ERROR_SD_FULL:
         if (state <= 0)
         {
             leds.setColorRGB(RED);
@@ -61,14 +64,19 @@ ISR(TIMER1_COMPA_vect) // check if button is pressed
         }
         if (state >= 1)// 1s
         {
-            if (ERROR_CAPTOR_ACCESS) leds.setColorRGB(GREEN);
-            if (ERROR_GPS) leds.setColorRGB(YELLOW);
-            if (ERROR_CLOCK_ACCESS) leds.setColorRGB(BLUE);
-            if (ERROR_SD_FULL) leds.setColorRGB(WHITE);
-            state -= (LED_UPDATE_INTERVAL/62500);
+            if (modeVar.ledMode==ERROR_CAPTOR_ACCESS) leds.setColorRGB(GREEN);
+            if (modeVar.ledMode==ERROR_GPS) leds.setColorRGB(YELLOW);
+            if (modeVar.ledMode==ERROR_CLOCK_ACCESS) leds.setColorRGB(BLUE);
+            if (modeVar.ledMode==ERROR_SD_FULL) leds.setColorRGB(WHITE);
+            state += (LED_UPDATE_INTERVAL/62500);
+        }
+        if (state >= 2)
+        {
+            state = 0;
         }
         break;
-    case (ERROR_SD_WRITE, ERROR_DATA_INCOHERENCE):
+    case ERROR_SD_WRITE:
+    case ERROR_DATA_INCOHERENCE:
         if (state <= 0)
         {
             leds.setColorRGB(RED);
@@ -76,12 +84,17 @@ ISR(TIMER1_COMPA_vect) // check if button is pressed
         }
         if (state >= 1)
         {
-            if (ERROR_SD_WRITE) leds.setColorRGB(WHITE);
-            if (ERROR_DATA_INCOHERENCE) leds.setColorRGB(GREEN);
-            state -= ((LED_UPDATE_INTERVAL / 2)/62500);
+            if (modeVar.ledMode==ERROR_SD_WRITE) leds.setColorRGB(WHITE);
+            if (modeVar.ledMode==ERROR_DATA_INCOHERENCE) leds.setColorRGB(GREEN);
+            state += ((LED_UPDATE_INTERVAL / 2)/62500);
+        }
+        if (state >= 2)
+        {
+            state = 0;
         }
         break;
     default:
+        state = 0;
         if (modeVar.ledMode == MAINTENANCE) leds.setColorRGB(ORANGE);
         if (modeVar.ledMode == ECONOMY) leds.setColorRGB(BLUE);
         if (modeVar.ledMode == STANDARD) leds.setColorRGB(GREEN);
