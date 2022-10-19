@@ -27,17 +27,6 @@
 #define GPS_TX 7 // define the TX pin for the GPS module
 #define GPS_RX 8 // define the RX pin for the GPS module
 
-#define STANDARD 1                // define the value of the standard mode
-#define CONFIGURATION 2           // define the value of the configuration mode
-#define ECONOMY 3                 // define the value of the economy mode
-#define MAINTENANCE 4             // define the value of the maintenance mode
-#define ERROR_CLOCK_ACCESS 5      // define the value of the clock error
-#define ERROR_GPS 6               // define the value of the GPS error mode
-#define ERROR_CAPTOR_ACCESS 7     // define the value of the captor acess error mode
-#define ERROR_DATA_INCOHERENCE 8  // define the value of the INCOHERENCE error mode
-#define ERROR_SD_FULL 9           // define the value of the SD card FULL error mode
-#define ERROR_SD_WRITE 10         // define the value of the BME280 access error mode
-
 ChainableLED leds(LED_PIN, LED_DATA_PIN, LEDS_NUM);
 
 Adafruit_BME280 bme; // initialize I2C communication for the bme280 sensor
@@ -46,153 +35,22 @@ SoftwareSerial GPS(GPS_TX, GPS_RX); // initialize the pins for the GPS module
 
 TinyGPSPlus gps; // initialize the GPS module
 
-int ledMode = STANDARD;          // initialize the variable to store the LED mode
-int actualMode = STANDARD;       // initialize the variable to store the actual mode
-int precedentMode = MAINTENANCE; // initialize the variable to store the precedent mode
-
 ISR(TIMER1_COMPA_vect) // led state update interrupt
 {
-    static bool ledState = false;
-
-    switch (ledMode)
-    {
-    case STANDARD:                      // standard mode
-        leds.setColorRGB(0, 0, 255, 0); // LED to green
-        break;
-
-    case CONFIGURATION:                   // configuration mode
-        leds.setColorRGB(0, 255, 255, 0); // LED to yellow
-        break;
-
-    case ECONOMY:                       // economy mode
-        leds.setColorRGB(0, 0, 0, 255); // LED to blue
-        break;
-
-    case MAINTENANCE:                    // maintenance mode
-        leds.setColorRGB(0, 255, 64, 0); // LED to orange
-        break;
-
-    case ERROR_CLOCK_ACCESS: // clock access error mode
-        if (ledState)
-        {
-            ledState = false;
-            leds.setColorRGB(0, 255, 0, 0); // LED to red
-        }
-        else
-        {
-            ledState = true;
-            leds.setColorRGB(0, 0, 0, 255); // LED to blue
-        }
-        break;
-
-    case ERROR_GPS: // GPS access error mode
-        if (ledState)
-        {
-            ledState = false;
-            leds.setColorRGB(0, 255, 0, 0); // LED to red
-        }
-        else
-        {
-            ledState = true;
-            leds.setColorRGB(0, 255, 127, 0); // LED to yellow
-        }
-        break;
-
-    case ERROR_CAPTOR_ACCESS: // captor acess error mode
-        if (ledState)
-        {
-            ledState = false;
-            leds.setColorRGB(0, 255, 0, 0); // LED to red
-        }
-        else
-        {
-            ledState = true;
-            leds.setColorRGB(0, 0, 255, 0); // LED to green
-        }
-        break;
-
-    case ERROR_DATA_INCOHERENCE: // Data incoherence mode
-        if (ledState)
-        {
-            ledState = false;
-            leds.setColorRGB(0, 255, 0, 0); // LED to red
-        }
-        else
-        {
-            leds.setColorRGB(0, 0, 255, 0); // LED to green
-            ledMode = 12;
-        }
-        break;
-    case ERROR_SD_FULL: // SD card FULL error mode
-        if (ledState)
-        {
-            ledState = false;
-            leds.setColorRGB(0, 255, 0, 0); // LED to red
-        }
-        else
-        {
-            ledState = true;
-            leds.setColorRGB(0, 255, 255, 255); // LED to white
-        }
-        break;
-
-    case ERROR_SD_WRITE: // SD card access or edit error mode
-        if (ledState)
-        {
-            ledState = false;
-            leds.setColorRGB(0, 255, 0, 0); // LED to red
-        }
-        else
-        {
-            leds.setColorRGB(0, 255, 255, 255); // LED to white
-            ledMode = 11;
-        }
-        break;
-    case 11: // delay 2x mode 10
-        ledState = !ledState;
-        ledMode = ERROR_SD_WRITE;
-        break;
-    case 12: // delay 2x mode 8
-        ledState = !ledState;
-        ledMode = ERROR_DATA_INCOHERENCE;
-        break;
-
-    default:
-        leds.setColorRGB(0, 0, 0, 0); // LED to off
-        break;
-    }
+    Serial.println("\nTick\n");
 }
 
-void maintenanceMode()
+void redPressed()
 {
-    static int timePressed = millis();    // initialize the variable for the time the button is pressed
-    if ((digitalRead(RBTN_PIN)==HIGH) || (timePressed == 0))
-    {
-        timePressed = millis();
-    }
-    else if (millis() - timePressed > 5000) // if the button is pressed for more than 1 second
-    {
-        if (actualMode != MAINTENANCE) // if the program is not in MAINTENANCE MODE
-        {
-            precedentMode = actualMode;
-            ledMode, actualMode = MAINTENANCE; // set the LED to maintenance mode
-        }
-        else // if the program is in MAINTENANCE MODE
-        {
-            ledMode, actualMode = precedentMode;
-            precedentMode = MAINTENANCE;
-        }
-    }
-    else
-    {
-        timePressed = 0;
-    }
+    leds.setColorRGB(0, 255, 0, 0);
+    Serial.println("Red button pressed");
+
 }
 
-void ecoMode()
+void greenPressed()
 {
-    Serial.println("ecoMode");
-    // change config file
+    leds.setColorRGB(0, 0, 255, 0);
+    Serial.println("Green button pressed");
 }
 
 void checkSensors()
@@ -280,13 +138,15 @@ void setup()
     SD.begin(SD_PIN); // initialize the SD card
 
     bme.begin(BME280_ADDRESS); // initialize the BME280 sensor
+
     /*
     // initialize the BME280 sensor
     if (!bme.begin(BME280_ADDRESS)) 
     {  
         Serial.println("Could not find a valid BME280 sensor, check wiring!");
 
-    }*/
+    }
+    */
 
     GPS.begin(9600); // initialize the serial communication with the GPS module
 
@@ -294,8 +154,6 @@ void setup()
 
     pinMode(LUM_PIN, OUTPUT);  // initialize the pin for the luminosity sensor
     pinMode(LUM_PIN1, OUTPUT); //
-
-    //SD.begin(SD_PIN); // initialize the SD card
 
     // Check if the green button is pressed at startup
     if (digitalRead(GBTN_PIN) == LOW)
@@ -307,10 +165,8 @@ void setup()
         delay(1000);
     }
 
-    attachInterrupt(digitalPinToInterrupt(RBTN_PIN), maintenanceMode, CHANGE);
-    attachInterrupt(digitalPinToInterrupt(GBTN_PIN), ecoMode, CHANGE); // attach interrupt to the green button
-
-    SD.begin(SD_PIN); // initialize the SD card
+    attachInterrupt(digitalPinToInterrupt(RBTN_PIN), redPressed, CHANGE);
+    attachInterrupt(digitalPinToInterrupt(GBTN_PIN), greenPressed, CHANGE); // attach interrupt to the green button
     
     // Timer configuration
     noInterrupts(); // disable all interrupts
@@ -326,6 +182,7 @@ void setup()
 
     Serial.println("\nTest code is running\n");
     interrupts(); // enable all interrupts
+
 }
 
 void loop()
