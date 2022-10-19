@@ -45,13 +45,15 @@ TinyGPSPlus gps; // initialize the GPS module
 
 DS1307 clock; // initialize the RTC module
 
-struct modeVar modeVar; // define the mode structure
+struct config config; // initialize the config structure
 
-struct sensorsData sensorsData; // define the sensors data structure
+struct modeVar modeVar; // initialize the mode structure
 
-struct gpsData gpsData; // define the GPS data structure
+struct sensorsData sensorsData; // initialize the sensors data structure
 
-struct rtcData rtcData; // define the RTC data structure
+struct gpsData gpsData; // initialize the GPS data structure
+
+struct rtcData rtcData; // initialize the RTC data structure
 
 ISR(TIMER1_COMPA_vect) // check if button is pressed
 {
@@ -150,7 +152,7 @@ void configMode()
 
 void getData()
 {
-
+    
 }
 
 void setup()
