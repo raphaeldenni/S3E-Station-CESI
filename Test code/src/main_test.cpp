@@ -1,12 +1,10 @@
-#include <Arduino.h>               // Arduino library
+#include <Arduino.h>        // Arduino library
 #include <Wire.h>           // I2C library
-#include <SPI.h>                   // Serial Peripheral Interface library for communication with the SD card and GPS module
-#include <SD.h>                    // Library for the SD card
+#include <SPI.h>            // Serial Peripheral Interface library for communication with the SD card and GPS module
+#include <SD.h>             // Library for the SD card
 #include <SoftwareSerial.h> // Library for the GPS module
 
 #include <ChainableLED.h>            // Library for the LED strip
-#include <Adafruit_Sensor.h>         // Library for the BME280 sensor
-#include <Adafruit_BusIO_Register.h> // Library for the BME280 sensor
 #include <Adafruit_BME280.h>         // Library for the BME280 sensor
 #include <TinyGPSPlus.h>             // Library for the GPS module
 
@@ -20,7 +18,9 @@
 #define LUM_PIN A0  // first luminosity sensor pin
 #define LUM_PIN1 A1 // second luminosity sensor pin
 
-#define SEALEVELPRESSURE_HPA (1013.25) // define the sea level pressure
+#define BME_ADDRESS 0x76 // define the BME280 sensor address
+#define REFRESH_DELAY 1500 // define the delay between each refresh of the data
+#define SEALEVELPRESSURE_HPA (1024.90) // define the sea level pressure
 
 #define SD_PIN 4 // define the pin for the SD card
 
@@ -40,14 +40,14 @@
 
 ChainableLED leds(LED_PIN, LED_DATA_PIN, LEDS_NUM);
 
-Adafruit_BME280 bme; // I2C
+Adafruit_BME280 bme; // initialize I2C communication for the bme280 sensor
 
 SoftwareSerial GPS(GPS_TX, GPS_RX); // initialize the pins for the GPS module
 
 TinyGPSPlus gps; // initialize the GPS module
 
-int ledMode = STANDARD;    // initialize the variable to store the LED mode
-int actualMode = STANDARD; // initialize the variable to store the actual mode
+int ledMode = STANDARD;          // initialize the variable to store the LED mode
+int actualMode = STANDARD;       // initialize the variable to store the actual mode
 int precedentMode = MAINTENANCE; // initialize the variable to store the precedent mode
 
 ISR(TIMER1_COMPA_vect) // led state update interrupt
@@ -206,20 +206,30 @@ void checkSensors()
     Serial.println();
 
     // Check sensors pins
-	Serial.print("Temperature in deg C = ");
-	Serial.println(bme.readTemperature());
+    // Affichage de la TEMPÉRATURE
+    Serial.print(F("Temperature = "));
+    Serial.print(bme.readTemperature());
+    Serial.println(F(" °C"));
 
-	Serial.print("Pressure in hPa = ");
-	Serial.println(bme.readPressure() / 100.0F);
+    // Affichage du TAUX D'HUMIDITÉ
+    Serial.print(F("Humidity = "));
+    Serial.print(bme.readHumidity());
+    Serial.println(F(" %"));
+  
+    // Affichage de la PRESSION ATMOSPHÉRIQUE
+    Serial.print(F("Atmos pressure = "));
+    Serial.print(bme.readPressure() / 100.0F);
+    Serial.println(F(" hPa"));
 
-	Serial.print("Altitude in m = ");
-	Serial.println(bme.readAltitude(SEALEVELPRESSURE_HPA));
+    // Affichage de l'estimation d'ALTITUDE
+    Serial.print(F("Altitude = "));
+    Serial.print(bme.readAltitude(SEALEVELPRESSURE_HPA));
+    Serial.println(F(" m"));
 
-	Serial.print("Humidity in %RH = ");
-	Serial.println(bme.readHumidity());
+	delay(REFRESH_DELAY);
 
-	Serial.println();
-	delay(5000);
+    Serial.println();
+
 }
 
 void checkSD()
@@ -269,13 +279,14 @@ void setup()
 
     SD.begin(SD_PIN); // initialize the SD card
 
-    bme.begin(0x76); // initialize the BME280 sensor
-
-    if (!bme.begin()) 
+    bme.begin(BME280_ADDRESS); // initialize the BME280 sensor
+    /*
+    // initialize the BME280 sensor
+    if (!bme.begin(BME280_ADDRESS)) 
     {  
         Serial.println("Could not find a valid BME280 sensor, check wiring!");
 
-    }
+    }*/
 
     GPS.begin(9600); // initialize the serial communication with the GPS module
 
@@ -303,7 +314,7 @@ void setup()
     
     // Timer configuration
     noInterrupts(); // disable all interrupts
-    // initialize timer1
+
     TCCR1A = 0; // set entire TCCR1A register to 0
     TCCR1B = 0; // same for TCCR1B
     TCNT1 = 0;  // initialize counter value to 0
@@ -320,7 +331,7 @@ void setup()
 void loop()
 {
     checkSensors(); // check the multi-sensor
-    // checkSD(); // check the SD card
-    //// checkGPS(); // check the GPS module
+    // checkSD();      // check the SD card
+    // checkGPS();     // check the GPS module
 
 }
