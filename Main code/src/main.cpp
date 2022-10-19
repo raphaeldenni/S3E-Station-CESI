@@ -68,7 +68,7 @@ ISR(TIMER1_COMPA_vect) // check if button is pressed
         if (state <= 0)
         {
             leds.setColorRGB(RED);
-            state += (62500 / LED_UPDATE_INTERVAL);
+            state += (LED_UPDATE_INTERVAL/62500);
         }
         if (state >= 1)// 1s
         {
