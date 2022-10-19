@@ -15,6 +15,24 @@
 
 #define LED_UPDATE_INTERVAL 31250 // define the time between each LED update 62500 = 1s, Value is between 0 and 62500
 
+#define STANDARD 1               // define the value of the standard mode
+#define CONFIGURATION 2          // define the value of the configuration mode
+#define ECONOMY 3                // define the value of the economy mode
+#define MAINTENANCE 4            // define the value of the maintenance mode
+#define ERROR_CLOCK_ACCESS 5     // define the value of the clock error
+#define ERROR_GPS 6              // define the value of the GPS error mode
+#define ERROR_CAPTOR_ACCESS 7    // define the value of the captor acess error mode
+#define ERROR_DATA_INCOHERENCE 8 // define the value of the INCOHERENCE error mode
+#define ERROR_SD_FULL 9          // define the value of the SD card FULL error mode
+#define ERROR_SD_WRITE 10        // define the value of the BME280 access error mode
+
+#define RED 0, 255, 0, 0
+#define GREEN 0, 0, 255, 0
+#define BLUE 0, 0, 0, 255
+#define YELLOW 0, 255, 255, 0
+#define ORANGE 0, 255, 50, 0
+#define WHITE 0, 255, 255, 255
+
 ChainableLED leds(LED_PIN, LED_DATA_PIN, LEDS_NUM);
 
 struct modeVar
@@ -56,11 +74,11 @@ ISR(TIMER1_COMPA_vect) // check if button is pressed
             leds.setColorRGB(RED);
             state += (62500 / LED_UPDATE_INTERVAL);
         }
-        if (state >= 1)// 1s
+        if (state >= 1)
         {
             if (ERROR_SD_WRITE) leds.setColorRGB(WHITE);
             if (ERROR_DATA_INCOHERENCE) leds.setColorRGB(GREEN);
-            state -= (62500 / LED_UPDATE_INTERVAL / 2);
+            state -= (62500 / (LED_UPDATE_INTERVAL / 2));
         }
         break;
     default:
