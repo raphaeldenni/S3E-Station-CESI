@@ -1,51 +1,57 @@
-#include <Arduino.h>            // Arduino library
-#include <SPI.h>                // SPI library
-#include <Adafruit_I2CDevice.h> // I2C library
-#include <Adafruit_Sensor.h>    // I2C library
+#include <Arduino.h>        // Arduino library
+#include <Wire.h>           // I2C library
+#include <SPI.h>            // Serial Peripheral Interface library for communication with the SD card and GPS module
+#include <SD.h>             // Library for the SD card
+#include <SoftwareSerial.h> // Library for the GPS module
 
-#include <ChainableLED.h> // Library for the LED strip
+#include <ChainableLED.h>       // Library for the LED strip
+#include <Adafruit_Sensor.h>    // Library for the BME280 sensor
+#include <Adafruit_I2CDevice.h> // Library for the BME280 sensor
+#include <Adafruit_BME280.h>    // Library for the BME280 sensor
+#include <TinyGPSPlus.h>        // Library for the GPS module
+#include "DS1307.h"             // Library for the RTC module
+
 #include <config.h>       // Configuration file
+#include <struct.h> // Structure file
 
 #define GBTN_PIN 2 // define the pin for the green button
 #define RBTN_PIN 3 // define the pin for the red button
 
-#define LED_PIN 5      // define the alimentation pin for the LED
-#define LED_DATA_PIN 6 // define the data pin for the LED
-#define LEDS_NUM 1     // number of LEDs in the chain
-
+#define LED_PIN 5       // define the alimentation pin for the LED
+#define LED_DATA_PIN 6  // define the data pin for the LED
+#define LEDS_NUM 1      // number of LEDs in the chain
 #define LED_UPDATE_INTERVAL 31250 // define the time between each LED update 62500 = 1s, Value is between 0 and 62500
 
-#define STANDARD 1               // define the value of the standard mode
-#define CONFIGURATION 2          // define the value of the configuration mode
-#define ECONOMY 3                // define the value of the economy mode
-#define MAINTENANCE 4            // define the value of the maintenance mode
-#define ERROR_CLOCK_ACCESS 5     // define the value of the clock error
-#define ERROR_GPS 6              // define the value of the GPS error mode
-#define ERROR_CAPTOR_ACCESS 7    // define the value of the captor acess error mode
-#define ERROR_DATA_INCOHERENCE 8 // define the value of the INCOHERENCE error mode
-#define ERROR_SD_FULL 9          // define the value of the SD card FULL error mode
-#define ERROR_SD_WRITE 10        // define the value of the BME280 access error mode
+#define LUM_DATA_PIN A0   // first luminosity sensor pin
+#define SECOND_LUM_PIN A1 // second luminosity sensor pin
 
-#define RED 0, 255, 0, 0
-#define GREEN 0, 0, 255, 0
-#define BLUE 0, 0, 0, 255
-#define YELLOW 0, 255, 255, 0
-#define ORANGE 0, 255, 50, 0
-#define WHITE 0, 255, 255, 255
+#define BME_ADDRESS 0x76             // define the BME280 sensor address
+#define REFRESH_DELAY 1500           // define the delay between each refresh of the data
+#define SEALEVELPRESSURE_HPA 1024.90 // define the sea level pressure
+
+#define SD_PIN 4 // define the pin for the SD card
+
+#define TX_TO_GPS 8   // define the TX pin for the GPS module
+#define RX_TO_GPS 7   // define the RX pin for the GPS module
+#define GPS_BAUD 9600 // define the baud rate for the GPS module
 
 ChainableLED leds(LED_PIN, LED_DATA_PIN, LEDS_NUM);
 
-struct modeVar
-{
-    int actual = STANDARD;   // define the mode of the program
-    int previous = STANDARD; // define the previous mode of the program
-    int rBtntimePressed = 0; // define the pin for the red button
-    int gBtntimePressed = 0; // define the pin for the green button
-    int ledMode = STANDARD;
-};
+Adafruit_BME280 bme; // initialize I2C communication for the bme280 sensor
 
-struct modeVar modeVar; // define the configuration structure
-struct config config;   // define the configuration structure
+SoftwareSerial ss(RX_TO_GPS, TX_TO_GPS); // initialize the pins for the GPS module
+
+TinyGPSPlus gps; // initialize the GPS module
+
+DS1307 clock; // initialize the RTC module
+
+struct modeVar modeVar; // define the mode structure
+
+struct sensorsData sensorsData; // define the sensors data structure
+
+struct gpsData gpsData; // define the GPS data structure
+
+struct rtcData rtcData; // define the RTC data structure
 
 ISR(TIMER1_COMPA_vect) // check if button is pressed
 {
@@ -140,6 +146,11 @@ void configMode()
     Serial.println("ENTER CONFIGURATION MODE");
     Serial.println("Enter help() to show the list of commands.");
     Serial.println("Enter exit to show the list of commands.");
+}
+
+void getData()
+{
+
 }
 
 void setup()
