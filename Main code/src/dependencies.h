@@ -1,5 +1,7 @@
 // Dependencies file
 
+#include <stdlib.h>
+
 #include <Arduino.h>        // Arduino library
 #include <Wire.h>           // I2C library
 #include <SPI.h>            // Serial Peripheral Interface library for communication with the SD card and GPS module

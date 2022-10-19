@@ -1,5 +1,7 @@
 // Define file for the main program
 
+#define MONITOR_BAUD 9600 // define the baud rate for the serial monitor
+
 #define GBTN_PIN 2 // define the pin for the green button
 #define RBTN_PIN 3 // define the pin for the red button
 

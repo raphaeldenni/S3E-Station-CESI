@@ -10,33 +10,45 @@ struct modeVar
 
 };
 
-struct sensorsData
+struct luminosity
 {
-    float luminosity = 0;  // define the luminosity value
-    float temperature = 0; // define the temperature value
-    float humidity = 0;    // define the humidity value
-    float pressure = 0;    // define the pressure value
-    float altitude = 0;    // define the altitude value
+    float *luminosity = NULL;  // define the luminosity value
+};
+
+struct sensors
+{
+    float *temperature = NULL; // define the temperature value
+    float *humidity = NULL;    // define the humidity value
+    float *pressure = NULL;    // define the pressure value
+    float *altitude = NULL;    // define the altitude value
 
 };
 
-struct gpsData
+struct gps
 {
-    float latitude;  // define the latitude value
-    float longitude; // define the longitude value
-    float altitude;  // define the altitude value
+    float *latitude = NULL;  // define the latitude value
+    float *longitude = NULL; // define the longitude value
+    float *altitude = NULL;  // define the altitude value
 
 };
 
-struct rtcData
+struct rtc
 {
-    int year = 2000; // define the year value
-    int month = 1;   // define the month value
-    int day = 1;     // define the day value
-    int hour = 0;    // define the hour value
-    int minute = 0;  // define the minute value
-    int second = 0;  // define the second value
+    int *year; // define the year value
+    int *month = NULL;   // define the month value
+    int *day = NULL;     // define the day value
+    int *hour = NULL;    // define the hour value
+    int *minute = NULL;  // define the minute value
+    int *second = NULL;  // define the second value
 
 };
 
+struct data
+{
+    struct luminosity luminosity;
+    struct sensors sensors;
+    struct gps gps;
+    struct rtc rtc;
+    
+};
 

@@ -16,12 +16,8 @@ struct config config; // initialize the config structure
 
 struct modeVar modeVar; // initialize the mode structure
 
-struct sensorsData sensorsData; // initialize the sensors data structure
-
-struct gpsData gpsData; // initialize the GPS data structure
-
-struct rtcData rtcData; // initialize the RTC data structure
-
+struct data data; // initialize the data structure
+/*
 ISR(TIMER1_COMPA_vect) // check if button is pressed
 {
     static float state = 0;
@@ -122,7 +118,7 @@ ISR(TIMER1_COMPA_vect) // check if button is pressed
         modeVar.gBtntimePressed = 0;
     }
 }
-
+*/
 void configMode()
 {
     Serial.println("ENTER CONFIGURATION MODE");
@@ -130,16 +126,76 @@ void configMode()
     Serial.println("Enter exit to show the list of commands.");
 }
 
-void getData()
+String toString()
 {
+    String dataString = "";
+    dataString += String(*data.rtc.year);
+    dataString += "/";
+    dataString += String(*data.rtc.month);
+    dataString += "/";
+    dataString += String(*data.rtc.day);
+    dataString += " ";
+    dataString += String(*data.rtc.hour);
+    dataString += ":";
+    dataString += String(*data.rtc.minute);
+    dataString += ":";
+    dataString += String(*data.rtc.second);
+    dataString += " ";
+
+    return dataString;
+}
+
+void getData()
+{/*
+    // Luminosity data
+    static float luminosity = analogRead(LUM_DATA_PIN)*100.0/1023.0; // get the luminosity value
+    Serial.println(luminosity);
+    // Check luminosity data
+    if (luminosity < 0 || luminosity > 100)
+    {
+        modeVar.ledMode = ERROR_DATA_INCOHERENCE;
+        Serial.println("ERROR: Luminosity data incoherence");
+    };
+
+    data.luminosity.luminosity = &luminosity; // store in struct the luminosity data
+    Serial.println(*data.luminosity.luminosity);
     // Sensors data
     if (bme.begin(BME_ADDRESS) || bme.begin(BME_ADDRESS_ALT))
     {
-        sensorsData.luminosity = analogRead(LUM_DATA_PIN)*100.0/1023.0; // get the luminosity data
-        sensorsData.temperature = bme.readTemperature();                // get the temperature data 
-        sensorsData.pressure = bme.readPressure() / 100.0F;             // get the pressure data
-        sensorsData.humidity = bme.readHumidity();                      // get the humidity data
-        sensorsData.altitude = bme.readAltitude(SEALEVELPRESSURE_HPA);  // get the altitude data
+        static float temperature = bme.readTemperature();                // get the temperature data 
+        static float pressure = bme.readPressure()/100.0F;               // get the pressure data
+        static float humidity = bme.readHumidity();                      // get the humidity data
+        static float altitude = bme.readAltitude(SEALEVELPRESSURE_HPA);  // get the altitude data
+        
+        // Check temperature data
+        if (temperature < -50 || temperature > 50)
+        {
+            modeVar.ledMode = ERROR_DATA_INCOHERENCE;
+            Serial.println("ERROR: Temperature data incoherence");
+
+        };
+
+        // Check pressure data
+        if (pressure < 800 || pressure > 1200)
+        {
+            modeVar.ledMode = ERROR_DATA_INCOHERENCE;
+            Serial.println("ERROR: Pressure data incoherence");
+
+        };
+
+        // Check humidity data
+        if (humidity < 0 || humidity > 100)
+        {
+            modeVar.ledMode = ERROR_DATA_INCOHERENCE;
+            Serial.println("ERROR: Humidity data incoherence");
+
+        };
+
+        data.sensors.temperature = &temperature;                   // store in struct the temperature data
+        data.sensors.pressure = &pressure;                         // store in struct the pressure data
+        data.sensors.humidity = &humidity;                         // store in struct the humidity data
+        data.sensors.altitude = &altitude;                         // store in struct the altitude data
+
     }
     else
     {
@@ -157,90 +213,74 @@ void getData()
             gpsData.latitude = gps.location.lat();    // get the latitude data
             gpsData.longitude = gps.location.lng();   // get the longitude data
             gpsData.altitude = gps.altitude.meters(); // get the altitude data
+
+            // Check latitude data
+            if (gpsData.latitude < -90 || gpsData.latitude > 90)
+            {
+                modeVar.ledMode = ERROR_DATA_INCOHERENCE;
+                Serial.println("ERROR: Latitude data incoherence");
+
+            };
+
+            // Check longitude data
+            if (gpsData.longitude < -180 || gpsData.longitude > 180)
+            {
+                modeVar.ledMode = ERROR_DATA_INCOHERENCE;
+                Serial.println("ERROR: Longitude data incoherence");
+
+            };
+
+            // Check altitude data
+            if (gpsData.altitude < -1000 || gpsData.altitude > 10000)
+            {
+                modeVar.ledMode = ERROR_DATA_INCOHERENCE;
+                Serial.println("ERROR: Altitude data incoherence");
+
+            };
+
         }
     }
     */
-
     // RTC data
-    rtcData.year = clock.year+2000; // get the year data
-    rtcData.month = clock.month;    // get the month data 
-    rtcData.day = clock.dayOfMonth; // get the day data
-    rtcData.hour = clock.hour;      // get the hour data
-    rtcData.minute = clock.minute;  // get the minute data
-    rtcData.second = clock.second;  // get the second data
+    static int year = clock.year+2000; // get the year data
+    Serial.println(year);
+    static int month = clock.month;    // get the month data
+    static int day = clock.dayOfMonth; // get the day data
+    static int hour = clock.hour;      // get the hour data
+    static int minute = clock.minute;  // get the minute data
+    static int second = clock.second;  // get the second data
 
-    // Check data coherence
-
-    // Check temperature data
-    if (sensorsData.temperature < -50 || sensorsData.temperature > 50)
-    {
-        modeVar.ledMode = ERROR_DATA_INCOHERENCE;
-        Serial.println("ERROR: Temperature data incoherence");
-    };
-
-    // Check pressure data
-    if (sensorsData.pressure < 800 || sensorsData.pressure > 1200)
-    {
-        modeVar.ledMode = ERROR_DATA_INCOHERENCE;
-        Serial.println("ERROR: Pressure data incoherence");
-    };
-
-    // Check humidity data
-    if (sensorsData.humidity < 0 || sensorsData.humidity > 100)
-    {
-        modeVar.ledMode = ERROR_DATA_INCOHERENCE;
-        Serial.println("ERROR: Humidity data incoherence");
-    };
-
-    // Check altitude data
-    if (sensorsData.luminosity < 0 || sensorsData.luminosity > 100)
-    {
-        modeVar.ledMode = ERROR_DATA_INCOHERENCE;
-        Serial.println("ERROR: Luminosity data incoherence");
-    };
-    /*
-    // Check altitude data
-    if (gpsData.latitude < -90 || gpsData.latitude > 90)
-    {
-        modeVar.ledMode = ERROR_DATA_INCOHERENCE;
-        Serial.println("ERROR: Latitude data incoherence");
-    };
-
-    // Check longitude data
-    if (gpsData.longitude < -180 || gpsData.longitude > 180)
-    {
-        modeVar.ledMode = ERROR_DATA_INCOHERENCE;
-        Serial.println("ERROR: Longitude data incoherence");
-    };
-
-    // Check altitude data
-    if (gpsData.altitude < -1000 || gpsData.altitude > 10000)
-    {
-        modeVar.ledMode = ERROR_DATA_INCOHERENCE;
-        Serial.println("ERROR: Altitude data incoherence");
-    };
-    */
     // Check year data
-    if (rtcData.year < 2000 || rtcData.year > 2100)
+    if (year < 2000 || year > 2100)
     {
         modeVar.ledMode = ERROR_DATA_INCOHERENCE;
         Serial.println("ERROR: Year data incoherence");
+
     };
 
     // Check month data
-    if (rtcData.month < 1 || rtcData.month > 12)
+    if (month < 1 || month > 12)
     {
         modeVar.ledMode = ERROR_DATA_INCOHERENCE;
         Serial.println("ERROR: Month data incoherence");
+
     };
 
     // Check day data
-    if (rtcData.day < 0 || rtcData.day > 31)
+    if (day < 0 || day > 31)
     {
         modeVar.ledMode = ERROR_DATA_INCOHERENCE;
         Serial.println("ERROR: Day data incoherence");
+
     };
 
+    data.rtc.year = &year;         // store in struct the year data
+    data.rtc.month = &month;       // store in struct the month data
+    data.rtc.day = &day;           // store in struct the day data
+    data.rtc.hour = &hour;         // store in struct the hour data
+    data.rtc.minute = &minute;     // store in struct the minute data
+    data.rtc.second = &second;     // store in struct the second data
+    
     return;
 
 }
@@ -250,11 +290,21 @@ void storeData()
     // Store data in the SD card
 
     // Open the file
-    File dataFile = SD.open("data.csv", FILE_WRITE);
+    File dataFile = SD.open("data.txt", FILE_WRITE);
     if (dataFile)
     {
         // Write data
-        
+        String string = toString();
+
+        dataFile.print(string);
+
+        Serial.println(string);
+
+        Serial.println("Data stored in the SD card");
+
+        // Close the file
+        dataFile.close();
+
     }
     else
     {
@@ -266,10 +316,11 @@ void storeData()
 
 void setup()
 {
-    Serial.begin(9600); // initialize the serial communication
+    Serial.begin(MONITOR_BAUD); // initialize the serial communication
     Wire.begin();       // initialize the I2C communication
     SD.begin(SD_PIN);   // initialize the SD card
 
+    /*
     pinMode(RBTN_PIN, INPUT); // define the red button pin as an input
     pinMode(GBTN_PIN, INPUT); // define the green button pin as an input
 
@@ -290,7 +341,7 @@ void setup()
     TIMSK1 |= (1 << OCIE1A);     // enable timer compare interrupt
 
     interrupts(); // enable all interrupts
-
+    */
 }
 
 void loop()
