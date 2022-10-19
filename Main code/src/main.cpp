@@ -35,9 +35,9 @@ ISR(TIMER1_COMPA_vect) // check if button is pressed
         if (state <= 0)
         {
             leds.setColorRGB(RED);
-            state += (62500 / LED_UPDATE_INTERVAL);
+            state += (LED_UPDATE_INTERVAL/62500);
         }
-        if (state >= 1)// 1s
+        else if (state >= 1)// 1s
         {
             if (modeVar.ledMode==ERROR_CAPTOR_ACCESS) leds.setColorRGB(GREEN);
             if (modeVar.ledMode==ERROR_GPS) leds.setColorRGB(YELLOW);
@@ -45,7 +45,7 @@ ISR(TIMER1_COMPA_vect) // check if button is pressed
             if (modeVar.ledMode==ERROR_SD_FULL) leds.setColorRGB(WHITE);
             state += (LED_UPDATE_INTERVAL/62500);
         }
-        if (state >= 2)
+        else if (state >= 2)
         {
             state = 0;
         }
@@ -57,13 +57,13 @@ ISR(TIMER1_COMPA_vect) // check if button is pressed
             leds.setColorRGB(RED);
             state += (LED_UPDATE_INTERVAL/62500);
         }
-        if (state >= 1)
+        else if (state >= 1)
         {
             if (modeVar.ledMode==ERROR_SD_WRITE) leds.setColorRGB(WHITE);
             if (modeVar.ledMode==ERROR_DATA_INCOHERENCE) leds.setColorRGB(GREEN);
             state += ((LED_UPDATE_INTERVAL / 2)/62500);
         }
-        if (state >= 2)
+        else if (state >= 2)
         {
             state = 0;
         }
