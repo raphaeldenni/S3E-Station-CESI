@@ -18,23 +18,9 @@
 #define LED_DATA_PIN 6 // define the data pin for the LED
 #define LEDS_NUM 1     // number of LEDs in the chain
 
-#define LUM_PIN A0  // first luminosity sensor pin
-#define LUM_PIN1 A1 // second luminosity sensor pin
-
-#define SEALEVELPRESSURE_HPA (1013.25) // define the sea level pressure
-
-#define SD_PIN 4 // define the pin for the SD card
-
-#define GPS_TX 7 // define the TX pin for the GPS module
-#define GPS_RX 8 // define the RX pin for the GPS module
-
 ChainableLED leds(LED_PIN, LED_DATA_PIN, LEDS_NUM);
 
-SoftwareSerial GPS(GPS_RX, GPS_TX); // initialize the pins for the GPS module
-
-TinyGPSPlus gps; // initialize the GPS module
-
-ISR(TIMER1_COMPA_vect) // led state update interrupt
+ISR(TIMER1_COMPA_vect) // check if button is pressed
 {
 
 }
@@ -42,19 +28,6 @@ ISR(TIMER1_COMPA_vect) // led state update interrupt
 void setup()
 {
     Serial.begin(9600); // initialize the serial communication
-
-    GPS.begin(9600); // initialize the serial communication with the GPS module
-
-    pinMode(GBTN_PIN, INPUT); // initialize the pin for the green button
-
-    pinMode(LUM_PIN, OUTPUT);  // initialize the pin for the luminosity sensor
-    pinMode(LUM_PIN1, OUTPUT); //
-
-    pinMode(TEMP_PIN, OUTPUT);  // initialize the pin for the temperature sensor
-    pinMode(TEMP_PIN1, OUTPUT); //
-
-    // SD.begin(SDPIN); // initialize the SD card
-
     // Check if the green button is pressed at startup
     if (digitalRead(GBTN_PIN) == LOW)
     {
@@ -64,9 +37,6 @@ void setup()
 
         delay(1000);
     }
-
-    SD.begin(SD_PIN); // initialize the SD card
-
     // Timer configuration
     noInterrupts(); // disable all interrupts
     // initialize timer1
@@ -79,11 +49,9 @@ void setup()
     TCCR1B |= (1 << CS12);   // 256 prescaler
     TIMSK1 |= (1 << OCIE1A); // enable timer compare interrupt
 
-    Serial.println("\nTest code is running\n");
     interrupts(); // enable all interrupts
 }
 
 void loop()
 {
-
 }
