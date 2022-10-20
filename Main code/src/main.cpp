@@ -18,6 +18,13 @@ struct modeVar modeVar; // initialize the mode structure
 
 struct data data; // initialize the data structure
 
+void configMode()
+{
+    Serial.println("ENTER CONFIGURATION MODE");
+    Serial.println("Enter help() to show the list of commands.");
+    Serial.println("Enter exit to show the list of commands.");
+}
+
 ISR(TIMER1_COMPA_vect) // check if button is pressed
 {
     static int state = 0;
@@ -31,38 +38,49 @@ ISR(TIMER1_COMPA_vect) // check if button is pressed
         if (state == 2)
         {
             leds.setColorRGB(RED);
-            state ++;
+            state++;
         }
-        else if (state == 4)// 1s
+        else if (state == 4) // 1s
         {
-            if (modeVar.ledMode==ERROR_CAPTOR_ACCESS) leds.setColorRGB(GREEN);
-            if (modeVar.ledMode==ERROR_GPS) leds.setColorRGB(YELLOW);
-            if (modeVar.ledMode==ERROR_CLOCK_ACCESS) leds.setColorRGB(BLUE);
-            if (modeVar.ledMode==ERROR_SD_FULL) leds.setColorRGB(WHITE);
+            if (modeVar.ledMode == ERROR_CAPTOR_ACCESS)
+                leds.setColorRGB(GREEN);
+            if (modeVar.ledMode == ERROR_GPS)
+                leds.setColorRGB(YELLOW);
+            if (modeVar.ledMode == ERROR_CLOCK_ACCESS)
+                leds.setColorRGB(BLUE);
+            if (modeVar.ledMode == ERROR_SD_FULL)
+                leds.setColorRGB(WHITE);
             state = 0;
         }
-        else state ++;
+        else
+            state++;
         break;
     case ERROR_SD_WRITE:
     case ERROR_DATA_INCOHERENCE:
         if (state == 4)
         {
             leds.setColorRGB(RED);
-            state ++;
+            state++;
         }
         else if (state == 6)
         {
-            if (modeVar.ledMode==ERROR_SD_WRITE) leds.setColorRGB(WHITE);
-            if (modeVar.ledMode==ERROR_DATA_INCOHERENCE) leds.setColorRGB(GREEN);
+            if (modeVar.ledMode == ERROR_SD_WRITE)
+                leds.setColorRGB(WHITE);
+            if (modeVar.ledMode == ERROR_DATA_INCOHERENCE)
+                leds.setColorRGB(GREEN);
             state = 0;
         }
-        else state ++;
+        else
+            state++;
         break;
     default:
         state = 0;
-        if (modeVar.ledMode == MAINTENANCE) leds.setColorRGB(ORANGE);
-        else if (modeVar.ledMode == ECONOMY) leds.setColorRGB(BLUE);
-        else if (modeVar.ledMode == STANDARD) leds.setColorRGB(GREEN);
+        if (modeVar.ledMode == MAINTENANCE)
+            leds.setColorRGB(ORANGE);
+        else if (modeVar.ledMode == ECONOMY)
+            leds.setColorRGB(BLUE);
+        else if (modeVar.ledMode == STANDARD)
+            leds.setColorRGB(GREEN);
         break;
     }
     // Button check
@@ -77,14 +95,12 @@ ISR(TIMER1_COMPA_vect) // check if button is pressed
                 modeVar.previous = modeVar.actual;
                 modeVar.actual = MAINTENANCE;
                 modeVar.ledMode = MAINTENANCE;
-
             }
             else
             {
                 modeVar.actual = modeVar.previous;
                 modeVar.previous = MAINTENANCE;
                 modeVar.ledMode = modeVar.actual;
-
             }
         }
     }
@@ -99,14 +115,12 @@ ISR(TIMER1_COMPA_vect) // check if button is pressed
                 modeVar.previous = modeVar.actual;
                 modeVar.actual = ECONOMY;
                 modeVar.ledMode = ECONOMY;
-
             }
             else if (modeVar.actual == ECONOMY)
             {
                 modeVar.previous = modeVar.actual;
                 modeVar.actual = STANDARD;
                 modeVar.ledMode = STANDARD;
-
             }
         }
     }
@@ -117,33 +131,25 @@ ISR(TIMER1_COMPA_vect) // check if button is pressed
     }
 }
 
-void configMode()
-{
-    Serial.println("ENTER CONFIGURATION MODE");
-    Serial.println("Enter help() to show the list of commands.");
-    Serial.println("Enter exit to show the list of commands.");
-}
-
 void getData()
-{/*
+{   
     // Luminosity data
-    data.luminosity.luminosity = analogRead(LUM_DATA_PIN)*100.0/1023.0; // get the luminosity value
-    Serial.println(data.luminosity.luminosity);
+    data.luminosity.luminosity = analogRead(LUM_DATA_PIN) * 100.0 / 1023.0; // get the luminosity value
     // Check luminosity data
     if (data.luminosity.luminosity < 0 || data.luminosity.luminosity > 100)
     {
         modeVar.ledMode = ERROR_DATA_INCOHERENCE;
-        Serial.println("ERROR: Luminosity data incoherence");
+        
     };
-
+    
     // Sensors data
     if (bme.begin(BME_ADDRESS) || bme.begin(BME_ADDRESS_ALT))
     {
-        data.sensors.temperature = bme.readTemperature();                // get the temperature data 
+        data.sensors.temperature = bme.readTemperature();                // get the temperature data
         data.sensors.pressure = bme.readPressure()/100.0F;               // get the pressure data
         data.sensors.humidity = bme.readHumidity();                      // get the humidity data
         data.sensors.altitude = bme.readAltitude(SEALEVELPRESSURE_HPA);  // get the altitude data
-        
+
         // Check temperature data
         if (data.sensors.temperature < -50 || data.sensors.temperature > 50)
         {
@@ -174,7 +180,7 @@ void getData()
         modeVar.ledMode = ERROR_CAPTOR_ACCESS;
 
     }
-    
+/*
     // GPS data
 
     while (ss.available() > 0)
@@ -215,102 +221,78 @@ void getData()
     // RTC data
     clock.getTime();
 
-    data.rtc.year = clock.year+2000; // get the year data
-    data.rtc.month = clock.month;    // get the month data
-    data.rtc.day = clock.dayOfMonth; // get the day data
-    data.rtc.hour = clock.hour;      // get the hour data
-    data.rtc.minute = clock.minute;  // get the minute data
-    data.rtc.second = clock.second;  // get the second data
+    data.rtc.year = clock.year + 2000; // get the year data
+    data.rtc.month = clock.month;      // get the month data
+    data.rtc.day = clock.dayOfMonth;   // get the day data
+    data.rtc.hour = clock.hour;        // get the hour data
+    data.rtc.minute = clock.minute;    // get the minute data
+    data.rtc.second = clock.second;    // get the second data
 
     // Check year data
     if (data.rtc.year < 2000 || data.rtc.year > 2099)
     {
         modeVar.error = ERROR_DATA_INCOHERENCE;
-        Serial.println("ERROR: Year data incoherence");
-
+        
     };
 
     // Check month data
     if (data.rtc.month < 1 || data.rtc.month > 12)
     {
         modeVar.error = ERROR_DATA_INCOHERENCE;
-        Serial.println("ERROR: Month data incoherence");
-
+        
     };
 
     // Check day data
     if (data.rtc.day < 1 || data.rtc.day > 31)
     {
         modeVar.error = ERROR_DATA_INCOHERENCE;
-        Serial.println("ERROR: Day data incoherence");
-
+        
     };
-    
-    return;
 
+    return;
 }
 
 void storeData()
-{
-    // Store data in the SD card
-    if (SD.begin(SD_PIN))
+{ 
+    noInterrupts();
+    // Store in SD card
+    File dataFile = SD.open("data.csv", FILE_WRITE);
+
+    if (dataFile)
     {
-        // Create a file
-        File dataFile = SD.open("data1.txt", FILE_WRITE);
-        if (dataFile)
-        {
-            // Write data in the file
-            dataFile.print(data.rtc.year);
-            dataFile.print("-");
-            dataFile.print(data.rtc.month);
-            dataFile.print("-");
-            dataFile.print(data.rtc.day);
-            dataFile.print(" ");
-            dataFile.print(data.rtc.hour);
-            dataFile.print(":");
-            dataFile.print(data.rtc.minute);
-            dataFile.print(":");
-            dataFile.print(data.rtc.second);
-            dataFile.print(";");
-            dataFile.print(data.sensors.temperature);
-            dataFile.print(";");
-            dataFile.print(data.sensors.pressure);
-            dataFile.print(";");
-            dataFile.print(data.sensors.humidity);
-            dataFile.print(";");
-            dataFile.print(data.sensors.altitude);
-            dataFile.print(";");
-            dataFile.print(data.luminosity.luminosity);
-            dataFile.print(";");
-            /*
-            dataFile.print(gpsData.latitude);
-            dataFile.print(",");
-            dataFile.print(gpsData.longitude);
-            dataFile.print(",");
-            dataFile.print(gpsData.altitude);*/
-            dataFile.println();
-            dataFile.close();
+        dataFile.print(data.rtc.year);
+        dataFile.print("-");
+        dataFile.print(data.rtc.month);
+        dataFile.print("-");
+        dataFile.print(data.rtc.day);
+        dataFile.print(" ");
+        dataFile.print(data.rtc.hour);
+        dataFile.print(":");
+        dataFile.print(data.rtc.minute);
+        dataFile.print(":");
+        dataFile.print(data.rtc.second);
+        dataFile.print(";");
+        dataFile.print(data.sensors.temperature);
+        dataFile.print(";");
+        dataFile.print(data.sensors.pressure);
+        dataFile.print(";");
+        dataFile.print(data.sensors.humidity);
+        dataFile.print(";");
+        dataFile.print(data.sensors.altitude);
+        dataFile.print(";");
+        dataFile.print(data.luminosity.luminosity);
+        dataFile.println();
 
-            Serial.println("Data stored in the SD card");
-
-        }
-        else
-        {
-            modeVar.error = ERROR_SD_WRITE;
-
-            Serial.println("ERROR: Can't write in the SD card");
-
-        }
-        
+        dataFile.close();
+        Serial.println("\nSD card is working\n");
     }
     else
     {
-        modeVar.error = ERROR_SD_FULL;
-        Serial.println("ERROR: SD card full");
-
+        //modeVar.ledMode = ERROR_SD_ACCESS;
+        Serial.println("\nError opening data.csv\n");
     }
-    return;
- 
+    interrupts();
+
 }
 
 void printDataSerial()
@@ -337,23 +319,25 @@ void printDataSerial()
     Serial.print(data.sensors.altitude);
     Serial.print(";");
     Serial.print(data.luminosity.luminosity);
-    Serial.print(";");
     Serial.println();
     return;
-
 }
 
 void setup()
 {
     Serial.begin(MONITOR_BAUD); // initialize the serial communication
-    Wire.begin();       // initialize the I2C communication
-    //SD.begin(SD_PIN);   // initialize the SD card
-    clock.begin();      // initialize the RTC
-    
+
+    Wire.begin(); // initialize the I2C communication
+
+    SD.begin(SD_PIN); // initialize the SD card
+
+    clock.begin(); // initialize the RTC
+
+    if (digitalRead(GBTN_PIN) == LOW)
+        configMode(); // if the green button is pressed at startup, enter configuration mode
+
     pinMode(RBTN_PIN, INPUT); // define the red button pin as an input
     pinMode(GBTN_PIN, INPUT); // define the green button pin as an input
-
-    if (digitalRead(GBTN_PIN) == LOW) configMode(); // if the green button is pressed at startup, enter configuration mode
 
     // Timer configuration
     noInterrupts(); // disable all interrupts
@@ -376,14 +360,21 @@ void loop()
 {
     if (digitalRead(RBTN_PIN) == HIGH && digitalRead(GBTN_PIN) == HIGH) // if red or green button is not pressed check if error, so we see if changing mode
     {
-        if (modeVar.error == NO_ERROR) modeVar.ledMode = modeVar.actual;
-        else modeVar.ledMode = modeVar.error;
+        if (modeVar.error == NO_ERROR)
+            modeVar.ledMode = modeVar.actual;
+        else
+            modeVar.ledMode = modeVar.error;
     }
-    else modeVar.ledMode = modeVar.actual;
-    
+    else
+        modeVar.ledMode = modeVar.actual;
+
     getData(); // get data from the sensors
 
-    if (modeVar.actual == MAINTENANCE) printDataSerial();
-    else storeData();
-    delay(1000);
+    if (modeVar.actual == MAINTENANCE)
+        printDataSerial();
+    else
+        storeData();
+
+    delay(2000);
+
 }
