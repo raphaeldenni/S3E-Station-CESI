@@ -8,7 +8,7 @@
 #define LED_PIN 5                 // define the alimentation pin for the LED
 #define LED_DATA_PIN 6            // define the data pin for the LED
 #define LEDS_NUM 1                // number of LEDs in the chain
-#define LED_UPDATE_INTERVAL 31250 // define the time between each LED update 62500 = 1s, Value is between 0 and 62500
+#define LED_UPDATE_INTERVAL 62500 // define the time between each LED update 62500 = 1s, Value is between 0 and 62500
 
 #define LUM_DATA_PIN A0   // luminosity sensor data pin
 #define SECOND_LUM_PIN A1 // second luminosity sensor pin

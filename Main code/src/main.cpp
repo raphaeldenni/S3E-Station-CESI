@@ -17,7 +17,7 @@ struct config config; // initialize the config structure
 struct modeVar modeVar; // initialize the mode structure
 
 struct data data; // initialize the data structure
-/*
+
 ISR(TIMER1_COMPA_vect) // check if button is pressed
 {
     static float state = 0;
@@ -67,8 +67,8 @@ ISR(TIMER1_COMPA_vect) // check if button is pressed
     default:
         state = 0;
         if (modeVar.ledMode == MAINTENANCE) leds.setColorRGB(ORANGE);
-        if (modeVar.ledMode == ECONOMY) leds.setColorRGB(BLUE);
-        if (modeVar.ledMode == STANDARD) leds.setColorRGB(GREEN);
+        else if (modeVar.ledMode == ECONOMY) leds.setColorRGB(BLUE);
+        else if (modeVar.ledMode == STANDARD) leds.setColorRGB(GREEN);
         break;
     }
     // Button check
@@ -82,13 +82,11 @@ ISR(TIMER1_COMPA_vect) // check if button is pressed
             {
                 modeVar.previous = modeVar.actual;
                 modeVar.actual = MAINTENANCE;
-                Serial.println("ENTER MAINTENANCE MODE");
             }
             else
             {
                 modeVar.actual = modeVar.previous;
                 modeVar.previous = MAINTENANCE;
-                Serial.println("EXIT MAINTENANCE MODE");
             }
         }
     }
@@ -102,13 +100,11 @@ ISR(TIMER1_COMPA_vect) // check if button is pressed
             {
                 modeVar.previous = modeVar.actual;
                 modeVar.actual = ECONOMY;
-                Serial.println("ENTER ECONOMY MODE");
             }
             else if (modeVar.actual == ECONOMY)
             {
                 modeVar.previous = modeVar.actual;
                 modeVar.actual = STANDARD;
-                Serial.println("ENTER STANDARD MODE");
             }
         }
     }
@@ -118,7 +114,7 @@ ISR(TIMER1_COMPA_vect) // check if button is pressed
         modeVar.gBtntimePressed = 0;
     }
 }
-*/
+
 void configMode()
 {
     Serial.println("ENTER CONFIGURATION MODE");
