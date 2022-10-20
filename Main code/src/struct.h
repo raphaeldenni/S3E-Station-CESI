@@ -34,7 +34,7 @@ struct gps
 
 struct rtc
 {
-    int *year; // define the year value
+    int *year = NULL; // define the year value
     int *month = NULL;   // define the month value
     int *day = NULL;     // define the day value
     int *hour = NULL;    // define the hour value
