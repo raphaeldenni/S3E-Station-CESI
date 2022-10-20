@@ -231,13 +231,14 @@ void setup()
 
     // WARNING ZONE : the following code change datetime of the RTC clock module. If the module is already set, don't use it.
 
-    /*
-    clock.fillDayOfWeek(WED); // set the day of the week
+    clock.fillByYMD(2022, 10, 20); // set the date
+    
+    clock.fillDayOfWeek(THU); // set the day of the week
 
     clock.fillByHMS(16,05,00); // delay of 18 seconds (for 16:00 click the upload button at 15:42)
 
     clock.setTime();
-    */
+    
 
    // END WARNING ZONE
     

@@ -133,12 +133,48 @@ ISR(TIMER1_COMPA_vect) // check if button is pressed
 
 void getData()
 {   
+    // RTC data
+    clock.getTime();
+
+    data.rtc.year = clock.year + 2000; // get the year data
+    data.rtc.month = clock.month;      // get the month data
+    data.rtc.day = clock.dayOfMonth;   // get the day data
+    data.rtc.hour = clock.hour;        // get the hour data
+    data.rtc.minute = clock.minute;    // get the minute data
+    data.rtc.second = clock.second;    // get the second data
+
+    // Check year data
+    if (data.rtc.year < 2000 || data.rtc.year > 2099)
+    {
+        modeVar.error = ERROR_DATA_INCOHERENCE;
+        DEBUG_SERIAL.println("ERROR: Year data incoherence");
+
+    };
+
+    // Check month data
+    if (data.rtc.month < 1 || data.rtc.month > 12)
+    {
+        modeVar.error = ERROR_DATA_INCOHERENCE;
+        DEBUG_SERIAL.println("ERROR: Month data incoherence");
+        
+    };
+
+    // Check day data
+    if (data.rtc.day < 1 || data.rtc.day > 31)
+    {
+        modeVar.error = ERROR_DATA_INCOHERENCE;
+        DEBUG_SERIAL.println("ERROR: Day data incoherence");
+        
+    };
+
+
     // Luminosity data
     data.luminosity.luminosity = analogRead(LUM_DATA_PIN) * 100.0 / 1023.0; // get the luminosity value
     // Check luminosity data
     if (data.luminosity.luminosity < 0 || data.luminosity.luminosity > 100)
     {
         modeVar.ledMode = ERROR_DATA_INCOHERENCE;
+        DEBUG_SERIAL.println("ERROR: Luminosity data incoherence");
         
     };
     
@@ -154,7 +190,7 @@ void getData()
         if (data.sensors.temperature < -50 || data.sensors.temperature > 50)
         {
             modeVar.ledMode = ERROR_DATA_INCOHERENCE;
-            Serial.println("ERROR: Temperature data incoherence");
+            DEBUG_SERIAL.println("ERROR: Temperature data incoherence");
 
         };
 
@@ -162,7 +198,7 @@ void getData()
         if (data.sensors.pressure < 800 || data.sensors.pressure > 1200)
         {
             modeVar.ledMode = ERROR_DATA_INCOHERENCE;
-            Serial.println("ERROR: Pressure data incoherence");
+            DEBUG_SERIAL.println("ERROR: Pressure data incoherence");
 
         };
 
@@ -170,7 +206,7 @@ void getData()
         if (data.sensors.humidity < 0 || data.sensors.humidity > 100)
         {
             modeVar.ledMode = ERROR_DATA_INCOHERENCE;
-            Serial.println("ERROR: Humidity data incoherence");
+            DEBUG_SERIAL.println("ERROR: Humidity data incoherence");
 
         };                       // store in struct the altitude data
 
@@ -178,76 +214,47 @@ void getData()
     else
     {
         modeVar.ledMode = ERROR_CAPTOR_ACCESS;
+        DEBUG_SERIAL.println("ERROR: BME280 access");
 
     }
-/*
-    // GPS data
+    
 
+    // GPS data
     while (ss.available() > 0)
     {
         if (gps.encode(ss.read()))
         {
-            gpsData.latitude = gps.location.lat();    // get the latitude data
-            gpsData.longitude = gps.location.lng();   // get the longitude data
-            gpsData.altitude = gps.altitude.meters(); // get the altitude data
+            data.gps.latitude = gps.location.lat();    // get the latitude data
+            data.gps.longitude = gps.location.lng();   // get the longitude data
+            data.gps.altitude = gps.altitude.meters(); // get the altitude data
 
             // Check latitude data
-            if (gpsData.latitude < -90 || gpsData.latitude > 90)
+            if (data.gps.latitude < -90 || data.gps.latitude > 90)
             {
                 modeVar.ledMode = ERROR_DATA_INCOHERENCE;
-                Serial.println("ERROR: Latitude data incoherence");
+                DEBUG_SERIAL.println("ERROR: Latitude data incoherence");
 
             };
 
             // Check longitude data
-            if (gpsData.longitude < -180 || gpsData.longitude > 180)
+            if (data.gps.longitude < -180 || data.gps.longitude > 180)
             {
                 modeVar.ledMode = ERROR_DATA_INCOHERENCE;
-                Serial.println("ERROR: Longitude data incoherence");
+                DEBUG_SERIAL.println("ERROR: Longitude data incoherence");
 
             };
 
             // Check altitude data
-            if (gpsData.altitude < -1000 || gpsData.altitude > 10000)
+            if (data.gps.altitude < -1000 || data.gps.altitude > 10000)
             {
                 modeVar.ledMode = ERROR_DATA_INCOHERENCE;
-                Serial.println("ERROR: Altitude data incoherence");
+                DEBUG_SERIAL.println("ERROR: Altitude data incoherence");
 
             };
 
         }
     }
-    */
-    // RTC data
-    clock.getTime();
-
-    data.rtc.year = clock.year + 2000; // get the year data
-    data.rtc.month = clock.month;      // get the month data
-    data.rtc.day = clock.dayOfMonth;   // get the day data
-    data.rtc.hour = clock.hour;        // get the hour data
-    data.rtc.minute = clock.minute;    // get the minute data
-    data.rtc.second = clock.second;    // get the second data
-
-    // Check year data
-    if (data.rtc.year < 2000 || data.rtc.year > 2099)
-    {
-        modeVar.error = ERROR_DATA_INCOHERENCE;
-        
-    };
-
-    // Check month data
-    if (data.rtc.month < 1 || data.rtc.month > 12)
-    {
-        modeVar.error = ERROR_DATA_INCOHERENCE;
-        
-    };
-
-    // Check day data
-    if (data.rtc.day < 1 || data.rtc.day > 31)
-    {
-        modeVar.error = ERROR_DATA_INCOHERENCE;
-        
-    };
+    
 
     return;
 }
@@ -255,6 +262,7 @@ void getData()
 void storeData()
 { 
     noInterrupts();
+
     // Store in SD card
     File dataFile = SD.open("data.csv", FILE_WRITE);
 
@@ -281,16 +289,23 @@ void storeData()
         dataFile.print(data.sensors.altitude);
         dataFile.print(";");
         dataFile.print(data.luminosity.luminosity);
+        dataFile.print(";");
+        dataFile.print(data.gps.latitude);
+        dataFile.print(",");
+        dataFile.print(data.gps.longitude);
+        dataFile.print(";");
+        dataFile.print(data.gps.altitude);
         dataFile.println();
 
         dataFile.close();
-        Serial.println("\nSD card is working\n");
+
     }
     else
     {
-        //modeVar.ledMode = ERROR_SD_ACCESS;
-        Serial.println("\nError opening data.csv\n");
+        modeVar.ledMode = ERROR_SD_FULL;
+
     }
+
     interrupts();
 
 }
@@ -310,6 +325,8 @@ void printDataSerial()
     Serial.print(":");
     Serial.print(data.rtc.second);
     Serial.print(";");
+    Serial.print(data.luminosity.luminosity);
+    Serial.print(";");
     Serial.print(data.sensors.temperature);
     Serial.print(";");
     Serial.print(data.sensors.pressure);
@@ -317,9 +334,15 @@ void printDataSerial()
     Serial.print(data.sensors.humidity);
     Serial.print(";");
     Serial.print(data.sensors.altitude);
-    Serial.print(";");
-    Serial.print(data.luminosity.luminosity);
+    Serial.println(";");
+    Serial.println(data.gps.latitude);
+    Serial.println(";");
+    Serial.println(data.gps.longitude);
+    Serial.println(";");
+    Serial.println(data.gps.altitude);
+
     Serial.println();
+
     return;
 }
 
@@ -358,22 +381,27 @@ void setup()
 
 void loop()
 {
-    if (digitalRead(RBTN_PIN) == HIGH && digitalRead(GBTN_PIN) == HIGH) // if red or green button is not pressed check if error, so we see if changing mode
+    // Check if the red or green button is pressed and enter the corresponding mode
+    // If a button is not pressed check for error
+    if (digitalRead(RBTN_PIN) == HIGH || digitalRead(GBTN_PIN) == HIGH) 
     {
         if (modeVar.error == NO_ERROR)
             modeVar.ledMode = modeVar.actual;
+
         else
             modeVar.ledMode = modeVar.error;
+
     }
     else
         modeVar.ledMode = modeVar.actual;
 
     getData(); // get data from the sensors
 
-    if (modeVar.actual == MAINTENANCE)
-        printDataSerial();
+    if (modeVar.actual == MAINTENANCE) 
+        printDataSerial();  // print data on the serial monitor
+
     else
-        storeData();
+        storeData(); // store data in SD card
 
     delay(2000);
 
