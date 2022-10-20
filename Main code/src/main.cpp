@@ -67,8 +67,8 @@ ISR(TIMER1_COMPA_vect) // check if button is pressed
     default:
         state = 0;
         if (modeVar.ledMode == MAINTENANCE) leds.setColorRGB(ORANGE);
-        if (modeVar.ledMode == ECONOMY) leds.setColorRGB(BLUE);
-        if (modeVar.ledMode == STANDARD) leds.setColorRGB(GREEN);
+        else if (modeVar.ledMode == ECONOMY) leds.setColorRGB(BLUE);
+        else if (modeVar.ledMode == STANDARD) leds.setColorRGB(GREEN);
         break;
     }
     // Button check
@@ -102,13 +102,11 @@ ISR(TIMER1_COMPA_vect) // check if button is pressed
             {
                 modeVar.previous = modeVar.actual;
                 modeVar.actual = ECONOMY;
-                Serial.println("ENTER ECONOMY MODE");
             }
             else if (modeVar.actual == ECONOMY)
             {
                 modeVar.previous = modeVar.actual;
                 modeVar.actual = STANDARD;
-                Serial.println("ENTER STANDARD MODE");
             }
         }
     }
@@ -205,7 +203,7 @@ void getData()
     
 
     // GPS data
-    
+
     while (ss.available() > 0)
     {
         if (gps.encode(ss.read()))
@@ -327,7 +325,7 @@ void setup()
     Serial.begin(MONITOR_BAUD); // initialize the serial communication
     Wire.begin();       // initialize the I2C communication
     SD.begin(SD_PIN);   // initialize the SD card
-
+    
     pinMode(RBTN_PIN, INPUT); // define the red button pin as an input
     pinMode(GBTN_PIN, INPUT); // define the green button pin as an input
 
@@ -352,14 +350,14 @@ void setup()
 }
 
 void loop()
-{
-    // Get DATA
-    getData();
-
-    // Store DATA
-    storeData();
-
-    delay(5000);
-    modeVar.ledMode++;
-
+{   
+    if (modeVar.error == NO_ERROR)
+    {
+        modeVar.ledMode = modeVar.actual;
+    }
+    else
+    {
+        modeVar.ledMode = modeVar.error;
+    };
+    Serial.println(modeVar.actual);// new line
 }

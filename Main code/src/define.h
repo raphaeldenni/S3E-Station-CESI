@@ -8,22 +8,23 @@
 #define LED_PIN 5                 // define the alimentation pin for the LED
 #define LED_DATA_PIN 6            // define the data pin for the LED
 #define LEDS_NUM 1                // number of LEDs in the chain
-#define LED_UPDATE_INTERVAL 31250 // define the time between each LED update 62500 = 1s, Value is between 0 and 62500
+#define LED_UPDATE_INTERVAL 62500 // define the time between each LED update 62500 = 1s, Value is between 0 and 62500
 
 #define LUM_DATA_PIN A0   // luminosity sensor data pin
 #define SECOND_LUM_PIN A1 // second luminosity sensor pin
 
 #define BME_ADDRESS 0x76             // define the BME280 sensor address
-#define BME_ADDRESS_ALT 0x77 // define the BME280 sensor address
+#define BME_ADDRESS_ALT 0x77         // define the BME280 sensor address
 #define REFRESH_DELAY 1500           // define the delay between each refresh of the data
 #define SEALEVELPRESSURE_HPA 1024.90 // define the sea level pressure
 
 #define SD_PIN 4 // define the pin for the SD card
 
-#define TX_PIN_TO_GPS 8   // define the TX pin for the GPS module
-#define RX_PIN_TO_GPS 7   // define the RX pin for the GPS module
-#define GPS_BAUD 9600     // define the baud rate for the GPS module
+#define TX_PIN_TO_GPS 8 // define the TX pin for the GPS module
+#define RX_PIN_TO_GPS 7 // define the RX pin for the GPS module
+#define GPS_BAUD 9600   // define the baud rate for the GPS module
 
+#define NO_ERROR 0               // everything is ok
 #define STANDARD 1               // define the value of the standard mode
 #define CONFIGURATION 2          // define the value of the configuration mode
 #define ECONOMY 3                // define the value of the economy mode
