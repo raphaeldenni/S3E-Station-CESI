@@ -1,6 +1,6 @@
 // Dependencies file
 
-#include <stdlib.h>
+#include <stdlib.h> // Only for alloc functions
 
 #include <Arduino.h>        // Arduino library
 #include <Wire.h>           // I2C library
