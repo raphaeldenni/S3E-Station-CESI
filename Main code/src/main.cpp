@@ -223,12 +223,12 @@ void getData()
     // RTC data
     clock.getTime();
 
-    static int year = clock.year+2000; // get the year data
-    static int month = clock.month;    // get the month data
-    static int day = clock.dayOfMonth; // get the day data
-    static int hour = clock.hour;      // get the hour data
-    static int minute = clock.minute;  // get the minute data
-    static int second = clock.second;  // get the second data
+    int year = clock.year+2000; // get the year data
+    int month = clock.month;    // get the month data
+    int day = clock.dayOfMonth; // get the day data
+    int hour = clock.hour;      // get the hour data
+    int minute = clock.minute;  // get the minute data
+    int second = clock.second;  // get the second data
 
     // Check year data
     if (year < 2000 || year > 2099)
@@ -268,7 +268,6 @@ void getData()
 void storeData()
 {
     // Store data in the SD card
-    noInterrupts();
     if (SD.begin(SD_PIN))
     {
         // Create a file
@@ -325,9 +324,6 @@ void storeData()
         Serial.println("ERROR: SD card full");
 
     }
-
-    interrupts();
-
     return;
  
 }
@@ -335,8 +331,29 @@ void storeData()
 void printDataSerial()
 {
     // Print data on the serial monitor
+    Serial.print(*data.rtc.year);
+    Serial.print("-");
+    Serial.print(*data.rtc.month);
+    Serial.print("-");
+    Serial.print(*data.rtc.day);
+    Serial.print(" ");
+    Serial.print(*data.rtc.hour);
+    Serial.print(":");
+    Serial.print(*data.rtc.minute);
+    Serial.print(":");
+    Serial.print(*data.rtc.second);
+    Serial.print(";");
+    Serial.print(*data.sensors.temperature);
+    Serial.print(";");
+    Serial.print(*data.sensors.pressure);
+    Serial.print(";");
+    Serial.print(*data.sensors.humidity);
+    Serial.print(";");
+    Serial.print(*data.sensors.altitude);
+    Serial.print(";");
+    Serial.print(*data.luminosity.luminosity);
+    Serial.print(";");
     Serial.println();
-
     return;
 
 }
@@ -377,13 +394,12 @@ void loop()
         if (modeVar.error == NO_ERROR) modeVar.ledMode = modeVar.actual;
         else modeVar.ledMode = modeVar.error;
     }
+
     modeVar.error = NO_ERROR;
     
     getData(); // get data from the sensors
 
     if (modeVar.actual == MAINTENANCE) printDataSerial();
     else storeData();
-
-    delay(1000);
-    
+    delay(1000); // wait 1 second   
 }

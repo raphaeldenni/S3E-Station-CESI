@@ -7,7 +7,7 @@ struct modeVar
     int error = NO_ERROR;    // define the error write in other module
     int rBtntimePressed = 0; // define the pin for the red button
     int gBtntimePressed = 0; // define the pin for the green button
-    int ledMode = STANDARD;
+    int ledMode = STANDARD;  // define the mode of the LEDs
 };
 
 struct luminosity
