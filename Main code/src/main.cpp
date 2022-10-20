@@ -23,6 +23,9 @@ void configMode()
     Serial.println("ENTER CONFIGURATION MODE");
     Serial.println("Enter help() to show the list of commands.");
     Serial.println("Enter exit to show the list of commands.");
+    
+
+
 }
 
 ISR(TIMER1_COMPA_vect) // check if button is pressed
