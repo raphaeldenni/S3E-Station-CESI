@@ -1,5 +1,8 @@
 // Define file for the main program
 
+#define DEBUG false                    // Set to true to enable debug mode
+#define DEBUG_SERIAL if(DEBUG) Serial // Debug serial port
+
 #define MONITOR_BAUD 9600 // define the baud rate for the serial monitor
 
 #define GBTN_PIN 2 // define the pin for the green button
@@ -24,7 +27,7 @@
 #define RX_PIN_TO_GPS 7 // define the RX pin for the GPS module
 #define GPS_BAUD 9600   // define the baud rate for the GPS module
 
-#define NO_ERROR 0               // everything is ok
+#define NO_ERROR 0               // define the no error code
 #define STANDARD 1               // define the value of the standard mode
 #define CONFIGURATION 2          // define the value of the configuration mode
 #define ECONOMY 3                // define the value of the economy mode

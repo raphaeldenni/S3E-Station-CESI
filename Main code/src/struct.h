@@ -8,11 +8,13 @@ struct modeVar
     int rBtntimePressed = 0; // define the pin for the red button
     int gBtntimePressed = 0; // define the pin for the green button
     int ledMode = STANDARD;  // define the mode of the LEDs
+
 };
 
 struct luminosity
 {
     float luminosity; // define the luminosity value
+
 };
 
 struct sensors
@@ -21,6 +23,7 @@ struct sensors
     float humidity;    // define the humidity value
     float pressure;    // define the pressure value
     float altitude;    // define the altitude value
+
 };
 
 struct gps
@@ -28,6 +31,7 @@ struct gps
     float latitude;  // define the latitude value
     float longitude; // define the longitude value
     float altitude;  // define the altitude value
+
 };
 
 struct rtc
@@ -47,4 +51,5 @@ struct data
     struct sensors sensors;
     struct gps gps;
     struct rtc rtc;
+    
 };
