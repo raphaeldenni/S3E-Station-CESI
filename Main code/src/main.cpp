@@ -201,7 +201,7 @@ void getData()
     
 
     // GPS data
-    /*
+
     while (ss.available() > 0)
     {
         if (gps.encode(ss.read()))
@@ -316,7 +316,7 @@ void setup()
     Wire.begin();       // initialize the I2C communication
     SD.begin(SD_PIN);   // initialize the SD card
 
-    /*
+
     pinMode(RBTN_PIN, INPUT); // define the red button pin as an input
     pinMode(GBTN_PIN, INPUT); // define the green button pin as an input
 
@@ -337,18 +337,17 @@ void setup()
     TIMSK1 |= (1 << OCIE1A);     // enable timer compare interrupt
 
     interrupts(); // enable all interrupts
-    */
 }
 
 void loop()
-{
-    // Get DATA
-    getData();
-
-    // Store DATA
-    storeData();
-
-    delay(5000);
-    modeVar.ledMode++;
-
+{   
+    if (modeVar.error == NO_ERROR)
+    {
+        modeVar.ledMode = modeVar.actual;
+    }
+    else
+    {
+        modeVar.ledMode = modeVar.error;
+    };
+    Serial.println(modeVar.actual);// new line
 }
