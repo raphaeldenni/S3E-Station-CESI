@@ -12,32 +12,32 @@ struct modeVar
 
 struct luminosity
 {
-    float *luminosity = NULL; // define the luminosity value
+    float luminosity; // define the luminosity value
 };
 
 struct sensors
 {
-    float *temperature = NULL; // define the temperature value
-    float *humidity = NULL;    // define the humidity value
-    float *pressure = NULL;    // define the pressure value
-    float *altitude = NULL;    // define the altitude value
+    float temperature; // define the temperature value
+    float humidity;    // define the humidity value
+    float pressure;    // define the pressure value
+    float altitude;    // define the altitude value
 };
 
 struct gps
 {
-    float *latitude = NULL;  // define the latitude value
-    float *longitude = NULL; // define the longitude value
-    float *altitude = NULL;  // define the altitude value
+    float latitude;  // define the latitude value
+    float longitude; // define the longitude value
+    float altitude;  // define the altitude value
 };
 
 struct rtc
 {
-    int *year = NULL; // define the year value
-    int *month = NULL;   // define the month value
-    int *day = NULL;     // define the day value
-    int *hour = NULL;    // define the hour value
-    int *minute = NULL;  // define the minute value
-    int *second = NULL;  // define the second value
+    int year; // define the year value
+    int month;   // define the month value
+    int day;     // define the day value
+    int hour;    // define the hour value
+    int minute;  // define the minute value
+    int second;  // define the second value
 
 };
 

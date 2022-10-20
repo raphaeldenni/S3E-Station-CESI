@@ -127,27 +127,25 @@ void configMode()
 void getData()
 {/*
     // Luminosity data
-    static float luminosity = analogRead(LUM_DATA_PIN)*100.0/1023.0; // get the luminosity value
-    Serial.println(luminosity);
+    data.luminosity.luminosity = analogRead(LUM_DATA_PIN)*100.0/1023.0; // get the luminosity value
+    Serial.println(data.luminosity.luminosity);
     // Check luminosity data
-    if (luminosity < 0 || luminosity > 100)
+    if (data.luminosity.luminosity < 0 || data.luminosity.luminosity > 100)
     {
         modeVar.ledMode = ERROR_DATA_INCOHERENCE;
         Serial.println("ERROR: Luminosity data incoherence");
     };
 
-    data.luminosity.luminosity = &luminosity; // store in struct the luminosity data
-    Serial.println(*data.luminosity.luminosity);
     // Sensors data
     if (bme.begin(BME_ADDRESS) || bme.begin(BME_ADDRESS_ALT))
     {
-        static float temperature = bme.readTemperature();                // get the temperature data 
-        static float pressure = bme.readPressure()/100.0F;               // get the pressure data
-        static float humidity = bme.readHumidity();                      // get the humidity data
-        static float altitude = bme.readAltitude(SEALEVELPRESSURE_HPA);  // get the altitude data
+        data.sensors.temperature = bme.readTemperature();                // get the temperature data 
+        data.sensors.pressure = bme.readPressure()/100.0F;               // get the pressure data
+        data.sensors.humidity = bme.readHumidity();                      // get the humidity data
+        data.sensors.altitude = bme.readAltitude(SEALEVELPRESSURE_HPA);  // get the altitude data
         
         // Check temperature data
-        if (temperature < -50 || temperature > 50)
+        if (data.sensors.temperature < -50 || data.sensors.temperature > 50)
         {
             modeVar.ledMode = ERROR_DATA_INCOHERENCE;
             Serial.println("ERROR: Temperature data incoherence");
@@ -155,7 +153,7 @@ void getData()
         };
 
         // Check pressure data
-        if (pressure < 800 || pressure > 1200)
+        if (data.sensors.pressure < 800 || data.sensors.pressure > 1200)
         {
             modeVar.ledMode = ERROR_DATA_INCOHERENCE;
             Serial.println("ERROR: Pressure data incoherence");
@@ -163,17 +161,12 @@ void getData()
         };
 
         // Check humidity data
-        if (humidity < 0 || humidity > 100)
+        if (data.sensors.humidity < 0 || data.sensors.humidity > 100)
         {
             modeVar.ledMode = ERROR_DATA_INCOHERENCE;
             Serial.println("ERROR: Humidity data incoherence");
 
-        };
-
-        data.sensors.temperature = &temperature;                   // store in struct the temperature data
-        data.sensors.pressure = &pressure;                         // store in struct the pressure data
-        data.sensors.humidity = &humidity;                         // store in struct the humidity data
-        data.sensors.altitude = &altitude;                         // store in struct the altitude data
+        };                       // store in struct the altitude data
 
     }
     else
@@ -182,7 +175,6 @@ void getData()
 
     }
     
-
     // GPS data
 
     while (ss.available() > 0)
@@ -223,15 +215,15 @@ void getData()
     // RTC data
     clock.getTime();
 
-    int year = clock.year+2000; // get the year data
-    int month = clock.month;    // get the month data
-    int day = clock.dayOfMonth; // get the day data
-    int hour = clock.hour;      // get the hour data
-    int minute = clock.minute;  // get the minute data
-    int second = clock.second;  // get the second data
+    data.rtc.year = clock.year+2000; // get the year data
+    data.rtc.month = clock.month;    // get the month data
+    data.rtc.day = clock.dayOfMonth; // get the day data
+    data.rtc.hour = clock.hour;      // get the hour data
+    data.rtc.minute = clock.minute;  // get the minute data
+    data.rtc.second = clock.second;  // get the second data
 
     // Check year data
-    if (year < 2000 || year > 2099)
+    if (data.rtc.year < 2000 || data.rtc.year > 2099)
     {
         modeVar.error = ERROR_DATA_INCOHERENCE;
         Serial.println("ERROR: Year data incoherence");
@@ -239,7 +231,7 @@ void getData()
     };
 
     // Check month data
-    if (month < 1 || month > 12)
+    if (data.rtc.month < 1 || data.rtc.month > 12)
     {
         modeVar.error = ERROR_DATA_INCOHERENCE;
         Serial.println("ERROR: Month data incoherence");
@@ -247,19 +239,12 @@ void getData()
     };
 
     // Check day data
-    if (day < 1 || day > 31)
+    if (data.rtc.day < 1 || data.rtc.day > 31)
     {
         modeVar.error = ERROR_DATA_INCOHERENCE;
         Serial.println("ERROR: Day data incoherence");
 
     };
-
-    data.rtc.year = &year;     // store in struct the year data
-    data.rtc.month = &month;   // store in struct the month data
-    data.rtc.day = &day;       // store in struct the day data
-    data.rtc.hour = &hour;     // store in struct the hour data
-    data.rtc.minute = &minute; // store in struct the minute data
-    data.rtc.second = &second; // store in struct the second data
     
     return;
 
@@ -275,27 +260,27 @@ void storeData()
         if (dataFile)
         {
             // Write data in the file
-            dataFile.print(*data.rtc.year);
+            dataFile.print(data.rtc.year);
             dataFile.print("-");
-            dataFile.print(*data.rtc.month);
+            dataFile.print(data.rtc.month);
             dataFile.print("-");
-            dataFile.print(*data.rtc.day);
+            dataFile.print(data.rtc.day);
             dataFile.print(" ");
-            dataFile.print(*data.rtc.hour);
+            dataFile.print(data.rtc.hour);
             dataFile.print(":");
-            dataFile.print(*data.rtc.minute);
+            dataFile.print(data.rtc.minute);
             dataFile.print(":");
-            dataFile.print(*data.rtc.second);
+            dataFile.print(data.rtc.second);
             dataFile.print(";");
-            dataFile.print(*data.sensors.temperature);
+            dataFile.print(data.sensors.temperature);
             dataFile.print(";");
-            dataFile.print(*data.sensors.pressure);
+            dataFile.print(data.sensors.pressure);
             dataFile.print(";");
-            dataFile.print(*data.sensors.humidity);
+            dataFile.print(data.sensors.humidity);
             dataFile.print(";");
-            dataFile.print(*data.sensors.altitude);
+            dataFile.print(data.sensors.altitude);
             dataFile.print(";");
-            dataFile.print(*data.luminosity.luminosity);
+            dataFile.print(data.luminosity.luminosity);
             dataFile.print(";");
             /*
             dataFile.print(gpsData.latitude);
@@ -331,27 +316,27 @@ void storeData()
 void printDataSerial()
 {
     // Print data on the serial monitor
-    Serial.print(*data.rtc.year);
+    Serial.print(data.rtc.year);
     Serial.print("-");
-    Serial.print(*data.rtc.month);
+    Serial.print(data.rtc.month);
     Serial.print("-");
-    Serial.print(*data.rtc.day);
+    Serial.print(data.rtc.day);
     Serial.print(" ");
-    Serial.print(*data.rtc.hour);
+    Serial.print(data.rtc.hour);
     Serial.print(":");
-    Serial.print(*data.rtc.minute);
+    Serial.print(data.rtc.minute);
     Serial.print(":");
-    Serial.print(*data.rtc.second);
+    Serial.print(data.rtc.second);
     Serial.print(";");
-    Serial.print(*data.sensors.temperature);
+    Serial.print(data.sensors.temperature);
     Serial.print(";");
-    Serial.print(*data.sensors.pressure);
+    Serial.print(data.sensors.pressure);
     Serial.print(";");
-    Serial.print(*data.sensors.humidity);
+    Serial.print(data.sensors.humidity);
     Serial.print(";");
-    Serial.print(*data.sensors.altitude);
+    Serial.print(data.sensors.altitude);
     Serial.print(";");
-    Serial.print(*data.luminosity.luminosity);
+    Serial.print(data.luminosity.luminosity);
     Serial.print(";");
     Serial.println();
     return;
@@ -394,12 +379,11 @@ void loop()
         if (modeVar.error == NO_ERROR) modeVar.ledMode = modeVar.actual;
         else modeVar.ledMode = modeVar.error;
     }
-
-    modeVar.error = NO_ERROR;
+    else modeVar.ledMode = modeVar.actual;
     
     getData(); // get data from the sensors
 
     if (modeVar.actual == MAINTENANCE) printDataSerial();
     else storeData();
-    delay(1000); // wait 1 second   
+    delay(1000);
 }
