@@ -349,5 +349,6 @@ void loop()
     {
         modeVar.ledMode = modeVar.error;
     };
-    Serial.println(modeVar.actual);// new line
+    getData();
+    storeData();
 }
