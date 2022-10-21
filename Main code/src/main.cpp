@@ -247,8 +247,14 @@ void getData()
         DEBUG_SERIAL.println("ERROR: Luminosity data incoherence");
         
         };
+        if(!analogRead(LUM_DATA_PIN))
+        {
+            modeVar.error = ERROR_CAPTOR_ACCESS;
+            DEBUG_SERIAL.println("ERROR: Luminosity captor access");
+        };
     
     };
+
     
 
     // Sensors data
@@ -344,7 +350,7 @@ void getData()
         }
         else
         {
-            modeVar.ledMode = ERROR_GPS;
+            modeVar.error = ERROR_GPS;
 
         };
     };
