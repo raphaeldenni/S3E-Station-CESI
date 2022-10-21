@@ -1,4 +1,10 @@
-// Meteorological data processing
+// Worldwide Weather Watcher Project
+// 22/10/2022
+
+// Group B
+// DENNI Raphaël
+// HOUILLE Lukas
+// ROUAS Léo
 
 #include <dependencies.h> // include all the libraries and the defines
 
@@ -18,15 +24,67 @@ struct modeVar modeVar; // initialize the mode structure
 
 struct data data; // initialize the data structure
 
-void configMode()
-{
-    Serial.println("ENTER CONFIGURATION MODE");
-    Serial.println("Enter help() to show the list of commands.");
-    Serial.println("Enter exit to show the list of commands.");
-    
 
+void configLoad()
+{
+    // Read config file
+    File dataFile = SD.open("config.txt", FILE_WRITE);
+
+    if (dataFile && digitalRead(RBTN_PIN) != LOW)
+    {
+        // Attribute the value of the config file to the config structure
+        leds.setColorRGB(YELLOW);
+
+        int buffer[8];
+
+        config.logInterval = dataFile.read(buffer, 2);
+        config.timeout = dataFile.read(buffer, 2);
+
+        config.year = dataFile.read(buffer, 4);
+        config.month = dataFile.read(buffer, 2);
+        config.day = dataFile.read(buffer, 2);
+
+        config.hour = dataFile.read(buffer, 2);
+        config.minute = dataFile.read(buffer, 2);
+        config.second = dataFile.read(buffer, 2);
+
+        config.lumin = dataFile.read();
+
+        config.temp = dataFile.read();
+        config.tempLow = dataFile.read(buffer, 3);
+        config.tempHigh = dataFile.read(buffer, 3);
+
+        config.press = dataFile.read();
+        config.pressLow = dataFile.read(buffer, 4);
+        config.pressHigh = dataFile.read(buffer, 4);
+
+        config.hum = dataFile.read();
+        
+    }
+    else
+    {
+        modeVar.ledMode = ERROR_SD_FULL;
+
+    };
+
+    dataFile.close();
+
+    if (digitalRead(GBTN_PIN) == LOW)
+    {
+        leds.setColorRGB(YELLOW);
+
+        clock.fillByYMD(config.year, config.month, config.day);
+        clock.fillByHMS(config.hour, config.minute, config.second);
+
+        clock.setTime();
+
+    };
+
+    if (config.logInterval < 600000 && DEBUG_INTERVAL == false)
+        config.logInterval = 600000;
 
 }
+
 
 ISR(TIMER1_COMPA_vect) // check if button is pressed
 {
@@ -90,7 +148,7 @@ ISR(TIMER1_COMPA_vect) // check if button is pressed
     if (digitalRead(RBTN_PIN) == LOW)
     {
         modeVar.rBtntimePressed++;
-        if (modeVar.rBtntimePressed > (62500 * config.timeToSwitch / LED_UPDATE_INTERVAL))
+        if (modeVar.rBtntimePressed > (62500 * TIME_TO_SWITCH / LED_UPDATE_INTERVAL))
         {
             modeVar.rBtntimePressed = 0;
             if (modeVar.actual != MAINTENANCE)
@@ -110,7 +168,7 @@ ISR(TIMER1_COMPA_vect) // check if button is pressed
     else if (digitalRead(GBTN_PIN) == LOW) // priority to the red button
     {
         modeVar.gBtntimePressed++;
-        if (modeVar.gBtntimePressed > (62500 * config.timeToSwitch / LED_UPDATE_INTERVAL))
+        if (modeVar.gBtntimePressed > (62500 * TIME_TO_SWITCH / LED_UPDATE_INTERVAL))
         {
             modeVar.gBtntimePressed = 0;
             if (modeVar.actual == STANDARD)
@@ -133,6 +191,7 @@ ISR(TIMER1_COMPA_vect) // check if button is pressed
         modeVar.gBtntimePressed = 0;
     }
 }
+
 
 void getData()
 {   
@@ -170,48 +229,69 @@ void getData()
         
     };
 
-
     // Luminosity data
-    data.luminosity.luminosity = analogRead(LUM_DATA_PIN) * 100.0 / 1023.0; // get the luminosity value
-    // Check luminosity data
-    if (data.luminosity.luminosity < 0 || data.luminosity.luminosity > 100)
+    if (config.lumin == 1)
     {
+        data.luminosity.luminosity = analogRead(LUM_DATA_PIN) * 100.0 / 1023.0; // get the luminosity value
+        
+        // Check luminosity data
+        if (data.luminosity.luminosity < 0 || data.luminosity.luminosity > 100)
+        {
         modeVar.ledMode = ERROR_DATA_INCOHERENCE;
         DEBUG_SERIAL.println("ERROR: Luminosity data incoherence");
         
+        };
+    
     };
     
+
     // Sensors data
     if (bme.begin(BME_ADDRESS) || bme.begin(BME_ADDRESS_ALT))
     {
-        data.sensors.temperature = bme.readTemperature();                // get the temperature data
-        data.sensors.pressure = bme.readPressure()/100.0F;               // get the pressure data
-        data.sensors.humidity = bme.readHumidity();                      // get the humidity data
-        data.sensors.altitude = bme.readAltitude(SEALEVELPRESSURE_HPA);  // get the altitude data
-
-        // Check temperature data
-        if (data.sensors.temperature < -50 || data.sensors.temperature > 50)
+        // Temperature data
+        if (config.temp == 1)
         {
-            modeVar.ledMode = ERROR_DATA_INCOHERENCE;
-            DEBUG_SERIAL.println("ERROR: Temperature data incoherence");
+            data.sensors.temperature = bme.readTemperature();                // get the temperature data
+            
+            // Check temperature data
+            if (data.sensors.temperature < config.tempLow || data.sensors.temperature > config.tempHigh)
+            {
+                modeVar.ledMode = ERROR_DATA_INCOHERENCE;
+                DEBUG_SERIAL.println("ERROR: Temperature data incoherence");
+
+            };
 
         };
 
-        // Check pressure data
-        if (data.sensors.pressure < 800 || data.sensors.pressure > 1200)
+        // Pressure data
+        if (config.press == 1)
         {
-            modeVar.ledMode = ERROR_DATA_INCOHERENCE;
-            DEBUG_SERIAL.println("ERROR: Pressure data incoherence");
+            data.sensors.pressure = bme.readPressure()/100.0F;               // get the pressure data
 
+            // Check pressure data
+            if (data.sensors.pressure < config.pressLow || data.sensors.pressure > config.pressHigh)
+            {
+                modeVar.ledMode = ERROR_DATA_INCOHERENCE;
+                DEBUG_SERIAL.println("ERROR: Pressure data incoherence");
+
+            };
+            
         };
 
-        // Check humidity data
-        if (data.sensors.humidity < 0 || data.sensors.humidity > 100)
+        // Humidity data
+        if (config.hum == 1)
         {
-            modeVar.ledMode = ERROR_DATA_INCOHERENCE;
-            DEBUG_SERIAL.println("ERROR: Humidity data incoherence");
+            data.sensors.humidity = bme.readHumidity();                      // get the humidity data
 
-        };                       // store in struct the altitude data
+            // Check humidity data
+            if (data.sensors.humidity < 0 || data.sensors.humidity > 100)
+            {
+                modeVar.ledMode = ERROR_DATA_INCOHERENCE;
+                DEBUG_SERIAL.println("ERROR: Humidity data incoherence");
+
+            };       
+                
+        };
 
     }
     else
@@ -258,9 +338,8 @@ void getData()
         }
     }
     
-
-    return;
 }
+
 
 void storeData()
 { 
@@ -289,8 +368,6 @@ void storeData()
         dataFile.print(";");
         dataFile.print(data.sensors.humidity);
         dataFile.print(";");
-        dataFile.print(data.sensors.altitude);
-        dataFile.print(";");
         dataFile.print(data.luminosity.luminosity);
         dataFile.print(";");
         dataFile.print(data.gps.latitude);
@@ -313,9 +390,11 @@ void storeData()
 
 }
 
+
 void printDataSerial()
 {
     // Print data on the serial monitor
+    Serial.println("===================");
     Serial.print(data.rtc.year);
     Serial.print("-");
     Serial.print(data.rtc.month);
@@ -326,28 +405,24 @@ void printDataSerial()
     Serial.print(":");
     Serial.print(data.rtc.minute);
     Serial.print(":");
-    Serial.print(data.rtc.second);
-    Serial.print(";");
-    Serial.print(data.luminosity.luminosity);
-    Serial.print(";");
-    Serial.print(data.sensors.temperature);
-    Serial.print(";");
-    Serial.print(data.sensors.pressure);
-    Serial.print(";");
-    Serial.print(data.sensors.humidity);
-    Serial.print(";");
-    Serial.print(data.sensors.altitude);
-    Serial.println(";");
+    Serial.println(data.rtc.second);
+
+    Serial.println(data.luminosity.luminosity);
+
+    Serial.println(data.sensors.temperature);
+
+    Serial.println(data.sensors.pressure);
+
+    Serial.println(data.sensors.humidity);
+
     Serial.println(data.gps.latitude);
-    Serial.println(";");
+
     Serial.println(data.gps.longitude);
-    Serial.println(";");
+
     Serial.println(data.gps.altitude);
 
-    Serial.println();
-
-    return;
 }
+
 
 void setup()
 {
@@ -359,8 +434,9 @@ void setup()
 
     clock.begin(); // initialize the RTC
 
-    if (digitalRead(GBTN_PIN) == LOW)
-        configMode(); // if the green button is pressed at startup, enter configuration mode
+    //configLoad(); // load custom configuration
+
+    delay(2500); // wait 2.5 second
 
     pinMode(RBTN_PIN, INPUT); // define the red button pin as an input
     pinMode(GBTN_PIN, INPUT); // define the green button pin as an input
@@ -382,6 +458,7 @@ void setup()
     
 }
 
+
 void loop()
 {
     // Check if the red or green button is pressed and enter the corresponding mode
@@ -401,11 +478,18 @@ void loop()
     getData(); // get data from the sensors
 
     if (modeVar.actual == MAINTENANCE) 
+    {
         printDataSerial();  // print data on the serial monitor
-
+    
+    }
     else
         storeData(); // store data in SD card
 
-    delay(2000);
+    if (DEBUG_INTERVAL == true)
+        delay(config.logInterval); // wait for the next log interval (debug)
+
+    else 
+        delay(config.logInterval*1000*60); // wait for the next log interval
+        
 
 }

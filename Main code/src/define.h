@@ -1,9 +1,13 @@
 // Define file for the main program
 
-#define DEBUG false                    // Set to true to enable debug mode
-#define DEBUG_SERIAL if(DEBUG) Serial // Debug serial port
+#define DEBUG false         // Set to true to enable debug mode
+#define DEBUG_INTERVAL true // Set to true to enable debug mode for the interval
+
+#define DEBUG_SERIAL if(DEBUG) Serial  // Debug serial port
 
 #define MONITOR_BAUD 9600 // define the baud rate for the serial monitor
+
+#define TIME_TO_SWITCH 5 // define the time to switch between the modes
 
 #define GBTN_PIN 2 // define the pin for the green button
 #define RBTN_PIN 3 // define the pin for the red button
