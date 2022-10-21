@@ -176,12 +176,18 @@ ISR(TIMER1_COMPA_vect) // check if button is pressed
                 modeVar.previous = modeVar.actual;
                 modeVar.actual = ECONOMY;
                 modeVar.ledMode = ECONOMY;
+
+                config.logInterval = config.logInterval*2;
+
             }
             else if (modeVar.actual == ECONOMY)
             {
                 modeVar.previous = modeVar.actual;
                 modeVar.actual = STANDARD;
                 modeVar.ledMode = STANDARD;
+
+                config.logInterval = config.logInterval/2;
+                
             }
         }
     }
@@ -472,8 +478,7 @@ void loop()
             modeVar.ledMode = modeVar.error;
 
     }
-    else
-        modeVar.ledMode = modeVar.actual;
+    else modeVar.ledMode = modeVar.actual;
 
     getData(); // get data from the sensors
 
