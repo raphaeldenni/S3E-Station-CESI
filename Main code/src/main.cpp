@@ -237,7 +237,7 @@ void getData()
         // Check luminosity data
         if (data.luminosity.luminosity < 0 || data.luminosity.luminosity > 100)
         {
-        modeVar.ledMode = ERROR_DATA_INCOHERENCE;
+        modeVar.error = ERROR_DATA_INCOHERENCE;
         DEBUG_SERIAL.println("ERROR: Luminosity data incoherence");
         
         };
@@ -256,7 +256,7 @@ void getData()
             // Check temperature data
             if (data.sensors.temperature < config.tempLow || data.sensors.temperature > config.tempHigh)
             {
-                modeVar.ledMode = ERROR_DATA_INCOHERENCE;
+                modeVar.error = ERROR_DATA_INCOHERENCE;
                 DEBUG_SERIAL.println("ERROR: Temperature data incoherence");
 
             };
@@ -271,7 +271,7 @@ void getData()
             // Check pressure data
             if (data.sensors.pressure < config.pressLow || data.sensors.pressure > config.pressHigh)
             {
-                modeVar.ledMode = ERROR_DATA_INCOHERENCE;
+                modeVar.error = ERROR_DATA_INCOHERENCE;
                 DEBUG_SERIAL.println("ERROR: Pressure data incoherence");
 
             };
@@ -286,7 +286,7 @@ void getData()
             // Check humidity data
             if (data.sensors.humidity < 0 || data.sensors.humidity > 100)
             {
-                modeVar.ledMode = ERROR_DATA_INCOHERENCE;
+                modeVar.error = ERROR_DATA_INCOHERENCE;
                 DEBUG_SERIAL.println("ERROR: Humidity data incoherence");
 
             };       
@@ -296,7 +296,7 @@ void getData()
     }
     else
     {
-        modeVar.ledMode = ERROR_CAPTOR_ACCESS;
+        modeVar.error = ERROR_CAPTOR_ACCESS;
         DEBUG_SERIAL.println("ERROR: BME280 access");
 
     }
@@ -314,7 +314,7 @@ void getData()
             // Check latitude data
             if (data.gps.latitude < -90 || data.gps.latitude > 90)
             {
-                modeVar.ledMode = ERROR_DATA_INCOHERENCE;
+                modeVar.error = ERROR_DATA_INCOHERENCE;
                 DEBUG_SERIAL.println("ERROR: Latitude data incoherence");
 
             };
@@ -322,7 +322,7 @@ void getData()
             // Check longitude data
             if (data.gps.longitude < -180 || data.gps.longitude > 180)
             {
-                modeVar.ledMode = ERROR_DATA_INCOHERENCE;
+                modeVar.error = ERROR_DATA_INCOHERENCE;
                 DEBUG_SERIAL.println("ERROR: Longitude data incoherence");
 
             };
@@ -330,13 +330,18 @@ void getData()
             // Check altitude data
             if (data.gps.altitude < -1000 || data.gps.altitude > 10000)
             {
-                modeVar.ledMode = ERROR_DATA_INCOHERENCE;
+                modeVar.error = ERROR_DATA_INCOHERENCE;
                 DEBUG_SERIAL.println("ERROR: Altitude data incoherence");
 
             };
 
         }
-    }
+        else
+        {
+            modeVar.ledMode = ERROR_GPS;
+
+        };
+    };
     
 }
 
@@ -382,7 +387,7 @@ void storeData()
     }
     else
     {
-        modeVar.ledMode = ERROR_SD_FULL;
+        modeVar.error = ERROR_SD_FULL;
 
     }
 
@@ -472,8 +477,7 @@ void loop()
             modeVar.ledMode = modeVar.error;
 
     }
-    else
-        modeVar.ledMode = modeVar.actual;
+    else modeVar.ledMode = modeVar.actual;
 
     getData(); // get data from the sensors
 
